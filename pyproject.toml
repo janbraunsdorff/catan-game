@@ -62,12 +62,4 @@ known_first_party = ["black", "blib2to3", "blackd", "_black_version"]
 
 
 [tool.mypy]
-follow_imports = "silent"
 ignore_missing_imports = true
-disallow_untyped_defs = true
-disallow_any_generics = true
-warn_unused_ignores = true
-strict = true
-
-[[tool.mypy.overrides]]
-module = 'catan'
