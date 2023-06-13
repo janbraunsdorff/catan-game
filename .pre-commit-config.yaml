@@ -6,6 +6,11 @@ repos:
     - id: end-of-file-fixer
     - id: trailing-whitespace
 
+  - repo: https://github.com/asottile/seed-isort-config
+    rev: v2.2.0
+    hooks:
+    -   id: seed-isort-config
+
   - repo: local
     hooks:
     - id: jupyter-nb-clear-output
@@ -20,9 +25,3 @@ repos:
       stages: [commit]
       language: system
       entry: black .
-    - id: sort-import
-      name: sort-import
-      files: \.py$
-      stages: [commit]
-      language: system
-      entry: isort .
