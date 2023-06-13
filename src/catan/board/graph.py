@@ -43,7 +43,11 @@ class BUILDINGS(Enum):
 Coor = Tuple[float, float]
 
 
-def create_board(size: List[int]) -> nx.Graph:
+def add_player(G: nx.Graph, player: nx.Graph):
+    pass
+
+
+def create_board(G: nx.Graph, size: List[int]) -> nx.Graph:
     """Create a simple and empty board containing tiles, buildings places, steeet places and tile providing build places
 
     Parameters
@@ -56,7 +60,6 @@ def create_board(size: List[int]) -> nx.Graph:
     nx.Graph
         Board as Networkx Graph
     """
-    G = nx.Graph()
     G, buildings, tile_building = create_tiles(G=G, board_size=size)
     corr_to_index = create_empty_buildings(
         G=G, buildings=buildings, tile_building=tile_building
@@ -72,7 +75,7 @@ def create_tiles(
     step_x: float = 10.0,
     step_y: float = 2.88675134595,
 ) -> Tuple[nx.Graph, List[Coor], Dict[int, List[Coor]]]:
-    """create a geometry disturbation of an catan born with a given size
+    """create a geometry disturbation of an catan born with a given size. Start index is 1
 
     Parameters
     ----------
@@ -140,6 +143,22 @@ def create_tiles(
 def create_empty_buildings(
     G: nx.Graph, buildings: List[Coor], tile_building: Dict[int, List[Coor]]
 ) -> Dict[Coor, int]:
+    """create building spaces for all tiles. starting index is 100
+
+    Parameters
+    ----------
+    G : nx.Graph
+        exiting grapg with empty tiles
+    buildings : List[Coor]
+        a list of ordered (by y,x) coordinates of each building placed in
+    tile_building : Dict[int, List[Coor]]
+        mapping of tile to building coordinates
+
+    Returns
+    -------
+    Dict[Coor, int]
+        Coordinates of each building
+    """
     corr_to_index = {}
     cnt_buildings = 100
     for x in buildings:
@@ -171,6 +190,18 @@ def create_empty_buildings(
 def create_empty_streets(
     G: nx.Graph, tile_building: Dict[int, List[Coor]], corr_to_index: Dict[Coor, int]
 ) -> None:
+    # TODO: check if each edge exists once
+    """create empy_streets between two building spaces
+
+    Parameters
+    ----------
+    G : nx.Graph
+        existing graph with tiles and building spaces
+    tile_building : Dict[int, List[Coor]]
+        mapping of tile to building coordinates
+    corr_to_index : Dict[Coor, int]
+        Coordinates of each building
+    """
     street_index = [(0, 1), (0, 2), (1, 3), (2, 4), (5, 3), (5, 4)]
     for _, porvided in tile_building.items():
         porvided.sort(key=lambda x: (x[1], x[0]))
