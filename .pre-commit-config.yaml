@@ -1,0 +1,28 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+    - id: check-yaml
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+
+  - repo: local
+    hooks:
+    - id: jupyter-nb-clear-output
+      name: jupyter-nb-clear-output
+      files: \.ipynb$
+      stages: [commit]
+      language: system
+      entry: jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace
+    - id: fomatting
+      name: formatting
+      files: \.py$
+      stages: [commit]
+      language: system
+      entry: black .
+    - id: sort-import
+      name: sort-import
+      files: \.py$
+      stages: [commit]
+      language: system
+      entry: isort .

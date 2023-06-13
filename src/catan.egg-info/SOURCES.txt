@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+setup.cfg
+src/catan/__init__.py
+src/catan/main.py
+src/catan.egg-info/PKG-INFO
+src/catan.egg-info/SOURCES.txt
+src/catan.egg-info/dependency_links.txt
+src/catan.egg-info/top_level.txt

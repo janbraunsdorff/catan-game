@@ -1,0 +1,56 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+
+[project]
+name = "catan"#
+description = "catan game engine and third and forth pc player"
+version = "0.0.1"
+authors = [
+    {name = "Jan Braunsdorff", email = "jan99braunsdorff@web.de"},
+]
+readme = "README.md"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "networkx >= 3.1"
+]
+package-dir="src/"
+
+[project.optional-dependencies]
+test = [
+     "pytest >=7.3.2",
+     "pytest-cov",
+]
+tools = [
+    "pre-commit>=3.3"
+]
+formatting = [
+    "isort>=5.12",
+    "black>=23.3"
+]
+
+
+[tool.black]
+line-length = 88
+target-version = ['py37', 'py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # The following are specific to Black, you probably don't want those.
+  | blib2to3
+  | tests/data
+  | profiling
+)/
+'''
+
+[tool.isort]
+atomic = true
+profile = "black"
+line_length = 88
+skip_gitignore = true
+skip_glob = ["src/blib2to3", "tests/data", "profiling"]
+known_first_party = ["black", "blib2to3", "blackd", "_black_version"]
