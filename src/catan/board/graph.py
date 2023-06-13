@@ -44,6 +44,18 @@ Coor = Tuple[float, float]
 
 
 def create_board(size: List[int]) -> nx.Graph:
+    """Create a simple and empty board containing tiles, buildings places, steeet places and tile providing build places
+
+    Parameters
+    ----------
+    size : List[int]
+        Size of the board
+
+    Returns
+    -------
+    nx.Graph
+        Board as Networkx Graph
+    """
     G = nx.Graph()
     G, buildings, tile_building = create_tiles(G=G, board_size=size)
     corr_to_index = create_empty_buildings(
@@ -60,6 +72,24 @@ def create_tiles(
     step_x: float = 10.0,
     step_y: float = 2.88675134595,
 ) -> Tuple[nx.Graph, List[Coor], Dict[int, List[Coor]]]:
+    """create a geometry disturbation of an catan born with a given size
+
+    Parameters
+    ----------
+    G : nx.Graph
+        Refference to an existing graph
+    board_size : List[int]
+        Size of an board. e.g. `[3, 4, 5, 4, 3]`
+    step_x : float, optional
+        geometric step in x, by default 10.0
+    step_y : float, optional
+        gemetric step in 0.33 * y for, by default 2.88675134595
+
+    Returns
+    -------
+    Tuple[nx.Graph, List[Coor], Dict[int, List[Coor]]]
+        Graph, sorted list of building coordinates, mapping of tile to building coordinates
+    """
     buildings: List[Coor] = []
     tile_building: Dict[int, List[Coor]] = {}
 
