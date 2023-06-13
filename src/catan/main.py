@@ -1,6 +1,6 @@
-from catan.bord.graph import create_board
-
 import os
+
+from catan.bord.graph import create_board
 
 if __name__ == "__main__":
     create_board(
