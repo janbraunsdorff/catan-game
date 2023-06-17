@@ -3,7 +3,8 @@ from typing import Dict, List, Tuple
 
 import networkx as nx
 
-from catan.board.graph import NODE_TYPES, create_tiles
+from catan.board.graph import create_tiles
+from catan.board.types import NODE_TYPES
 
 
 def test_create_filed_1():

@@ -1,53 +1,53 @@
-from enum import Enum
-from typing import Dict, List, Tuple
+"""functions to create an Board wirj player
+
+Examples:
+---------
+
+GameBuilder()
+    .create_board_of_size([3,4,5,3,4])
+    .with_player(...)
+    .with_player(...)
+    .with_player(...)
+    .build()
+
+"""
+
+from typing import Dict, List, Self, Tuple
 
 import networkx as nx
+from networkx.classes.reportviews import NodeView
+
+import catan.board.types as T
+from catan.player import Player
 
 
-class NODE_TYPES(Enum):
-    Missing = 0
-    Mountains = 1
-    Hills = 2
-    Forest = 3
-    Fields = 4
-    Pasture = 5
-    Desert = 6
+class BoardBuilder:
+    def __init__(self) -> None:
+        self.board: T.Board = nx.Graph()
+
+    def create_board_of_size(self, size: List[int]) -> Self:
+        self.board = create_board(self.board, size)
+        return self
+
+    def with_player(self, player: Player) -> Self:
+        self.board = add_player(self.board, player)
+        return self
+
+    def build(self) -> T.Board:
+        return self.board
 
 
-class PORTS(Enum):
-    Any = 1
-    Grain = 2
-    Ore = 3
-    Wool = 4
-    Brick = 5
-    Lumber = 6
+def add_player(G: T.Board, player: Player) -> T.Board:
+    G.add_node(player.color, type="player")
+    return G
 
 
-class ROBBERS(Enum):
-    Normal = 1
-    See = 3
+def get_player_node_by_color(G: T.Board, player: Player) -> Tuple[T.COLOR, dict]:
+    color = player.color
+    return color, G.nodes[color]
 
 
-class ROADS(Enum):
-    Missing = 1
-    Placed = 2
-    Boat = 3
-
-
-class BUILDINGS(Enum):
-    Missing = 1
-    Settelment = 2
-    City = 3
-
-
-Coor = Tuple[float, float]
-
-
-def add_player(G: nx.Graph, player: nx.Graph):
-    pass
-
-
-def create_board(G: nx.Graph, size: List[int]) -> nx.Graph:
+def create_board(G: T.Board, size: List[int]) -> T.Board:
     """Create a simple and empty board containing tiles, buildings places, steeet places and tile providing build places
 
     Parameters
@@ -57,7 +57,7 @@ def create_board(G: nx.Graph, size: List[int]) -> nx.Graph:
 
     Returns
     -------
-    nx.Graph
+    T.Board
         Board as Networkx Graph
     """
     G, buildings, tile_building = create_tiles(G=G, board_size=size)
@@ -70,16 +70,16 @@ def create_board(G: nx.Graph, size: List[int]) -> nx.Graph:
 
 
 def create_tiles(
-    G: nx.Graph,
+    G: T.Board,
     board_size: List[int],
     step_x: float = 10.0,
     step_y: float = 2.88675134595,
-) -> Tuple[nx.Graph, List[Coor], Dict[int, List[Coor]]]:
+) -> Tuple[T.Board, List[T.Coor], Dict[int, List[T.Coor]]]:
     """create a geometry disturbation of an catan born with a given size. Start index is 1
 
     Parameters
     ----------
-    G : nx.Graph
+    G : T.Board
         Refference to an existing graph
     board_size : List[int]
         Size of an board. e.g. `[3, 4, 5, 4, 3]`
@@ -90,11 +90,11 @@ def create_tiles(
 
     Returns
     -------
-    Tuple[nx.Graph, List[Coor], Dict[int, List[Coor]]]
+    Tuple[T.Board, List[Coor], Dict[int, List[Coor]]]
         Graph, sorted list of building coordinates, mapping of tile to building coordinates
     """
-    buildings: List[Coor] = []
-    tile_building: Dict[int, List[Coor]] = {}
+    buildings: List[T.Coor] = []
+    tile_building: Dict[int, List[T.Coor]] = {}
 
     cnt_tile = 1
     for idx, n_row in enumerate(board_size):
@@ -111,7 +111,7 @@ def create_tiles(
                         cnt_tile,
                         {
                             "type": "tile",
-                            "node_type": NODE_TYPES.Missing,
+                            "node_type": T.NODE_TYPES.Missing,
                             "dice_value": -1,
                             "coor": (x, y),
                         },
@@ -141,13 +141,13 @@ def create_tiles(
 
 
 def create_empty_buildings(
-    G: nx.Graph, buildings: List[Coor], tile_building: Dict[int, List[Coor]]
-) -> Dict[Coor, int]:
+    G: T.Board, buildings: List[T.Coor], tile_building: Dict[int, List[T.Coor]]
+) -> Dict[T.Coor, int]:
     """create building spaces for all tiles. starting index is 100
 
     Parameters
     ----------
-    G : nx.Graph
+    G : T.Board
         exiting grapg with empty tiles
     buildings : List[Coor]
         a list of ordered (by y,x) coordinates of each building placed in
@@ -167,7 +167,11 @@ def create_empty_buildings(
             [
                 (
                     cnt_buildings,
-                    {"type": "building", "bulding_type": BUILDINGS.Missing, "coor": x},
+                    {
+                        "type": "building",
+                        "bulding_type": T.BUILDINGS.Missing,
+                        "coor": x,
+                    },
                 )
             ]
         )
@@ -188,14 +192,14 @@ def create_empty_buildings(
 
 
 def create_empty_streets(
-    G: nx.Graph, tile_building: Dict[int, List[Coor]], corr_to_index: Dict[Coor, int]
+    G: T.Board, tile_building: Dict[int, List[T.Coor]], corr_to_index: Dict[T.Coor, int]
 ) -> None:
     # TODO: check if each edge exists once
     """create empy_streets between two building spaces
 
     Parameters
     ----------
-    G : nx.Graph
+    G : T.Board
         existing graph with tiles and building spaces
     tile_building : Dict[int, List[Coor]]
         mapping of tile to building coordinates
@@ -211,5 +215,9 @@ def create_empty_streets(
             G.add_edge(
                 x,
                 y,
-                label={"type": "street", "street_type": ROADS.Missing, "coor": [x, y]},
+                label={
+                    "type": "street",
+                    "street_type": T.ROADS.Missing,
+                    "coor": [x, y],
+                },
             )
