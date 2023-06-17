@@ -4,7 +4,7 @@ from typing import Dict, List, Tuple
 import networkx as nx
 
 from catan.board.graph import create_tiles
-from catan.board.types import NODE_TYPES
+from catan.board.types import TILE_TYPE
 
 
 def test_create_filed_1():
@@ -16,7 +16,7 @@ def test_create_filed_1():
 
     assert len(G.nodes()) == 1
     assert list(G.nodes(data=True))[0][1]["type"] == "tile"
-    assert list(G.nodes(data=True))[0][1]["node_type"] == NODE_TYPES.Missing
+    assert list(G.nodes(data=True))[0][1]["node_type"] == TILE_TYPE.Missing
 
     assert len(buildings) == 6
     assert len(tile_building) == 1
@@ -31,10 +31,10 @@ def test_create_filed_2():
 
     assert len(G.nodes()) == 2
     assert list(G.nodes(data=True))[0][1]["type"] == "tile"
-    assert list(G.nodes(data=True))[0][1]["node_type"] == NODE_TYPES.Missing
+    assert list(G.nodes(data=True))[0][1]["node_type"] == TILE_TYPE.Missing
 
     assert list(G.nodes(data=True))[1][1]["type"] == "tile"
-    assert list(G.nodes(data=True))[1][1]["node_type"] == NODE_TYPES.Missing
+    assert list(G.nodes(data=True))[1][1]["node_type"] == TILE_TYPE.Missing
 
     assert len(buildings) == 10
     assert len(tile_building) == 2

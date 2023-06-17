@@ -18,7 +18,7 @@ def add_building(
     G: T.Board,
     player: Player,
     index: int,
-    building: T.BUILDINGS,
+    building: T.BUILDING,
     founding: bool = False,
 ) -> None:
     # not more than 4 settelment already exits
@@ -33,5 +33,7 @@ def add_building(
     raise NotImplementedError()
 
 
-def add_connection(G: T.Board, player: Player, index: int, building: T.ROADS) -> None:
+def add_connection(
+    G: T.Board, player: Player, index: int, building: T.CONNECTION
+) -> None:
     raise NotImplementedError()

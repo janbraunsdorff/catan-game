@@ -4,7 +4,7 @@ from typing import Dict, List, Tuple
 from networkx import Graph
 
 
-class NODE_TYPES(Enum):
+class TILE_TYPE(Enum):
     Missing = 0
     Mountains = 1
     Hills = 2
@@ -14,7 +14,7 @@ class NODE_TYPES(Enum):
     Desert = 6
 
 
-class PORTS(Enum):
+class PORT(Enum):
     Any = 1
     Grain = 2
     Ore = 3
@@ -23,7 +23,7 @@ class PORTS(Enum):
     Lumber = 6
 
 
-class RESSOURCES(Enum):
+class RESSOURCE(Enum):
     Grain = 2
     Ore = 3
     Wool = 4
@@ -31,18 +31,18 @@ class RESSOURCES(Enum):
     Lumber = 6
 
 
-class ROBBERS(Enum):
+class ROBBER(Enum):
     Normal = 1
     See = 3
 
 
-class ROADS(Enum):
+class CONNECTION(Enum):
     Missing = 1
-    Placed = 2
+    Road = 2
     Boat = 3
 
 
-class BUILDINGS(Enum):
+class BUILDING(Enum):
     Missing = 1
     Settelment = 2
     City = 3
@@ -57,3 +57,7 @@ class COLOR(Enum):
     BLUE = 2
     WHITE = 3
     ORANGE = 4
+
+
+# TODO: edege types
+# TODO  node type

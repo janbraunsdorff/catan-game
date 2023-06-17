@@ -13,7 +13,7 @@ from catan.board.graph import get_player_node_by_color
 
 
 def add_ressource_to_player(
-    G: T.Board, player: Player, ressource: T.RESSOURCES
+    G: T.Board, player: Player, ressource: T.RESSOURCE
 ) -> T.Board:
     idx, data = get_player_node_by_color(G, player)
     ressource_id = str(uuid4())
@@ -25,14 +25,14 @@ def add_ressource_to_player(
 
 
 def add_ressources_to_player(
-    G: T.Board, player, ressources: List[T.RESSOURCES]
+    G: T.Board, player, ressources: List[T.RESSOURCE]
 ) -> T.Board:
     for ressource in ressources:
         G = add_ressource_to_player(G, player, ressource)
     return G
 
 
-def get_ressources_of_player_list(G: T.Board, player: Player) -> List[T.RESSOURCES]:
+def get_ressources_of_player_list(G: T.Board, player: Player) -> List[T.RESSOURCE]:
     idx, data = get_player_node_by_color(G, player)
     edges = G.edges(idx, data=True)
 
@@ -43,7 +43,7 @@ def get_ressources_of_player_list(G: T.Board, player: Player) -> List[T.RESSOURC
 
 
 def remove_ressource_from_player(
-    G: T.Board, player: Player, ressource: T.RESSOURCES
+    G: T.Board, player: Player, ressource: T.RESSOURCE
 ) -> T.Board:
     idx, data = get_player_node_by_color(G, player)
     edges = G.edges(idx, data=True)
@@ -64,3 +64,26 @@ def remove_ressource_from_player(
     G.remove_node(resource_node)
 
     return G
+
+
+def port_trate_4_to_1():
+    # check of number of resources
+    pass
+
+
+def post_trate_3_to_1():
+    # check for port
+    # check of number of resources
+    pass
+
+
+def port_trate_2_to_1():
+    # check for port
+    # check of number of resources
+    pass
+
+
+def player_trate():
+    # check of number of resources player a
+    # check of number of resources player b
+    pass

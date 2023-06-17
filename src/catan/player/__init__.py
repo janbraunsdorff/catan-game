@@ -14,10 +14,10 @@ class Player(ABC):
         return self._color
 
     def place_settelment(self, G: T.Board, index: int):
-        add_building(G, self, index, T.BUILDINGS.Settelment)
+        add_building(G, self, index, T.BUILDING.Settelment)
 
     def place_city(self, G: T.Board, index: int):
-        add_building(G, self, index, T.BUILDINGS.City)
+        add_building(G, self, index, T.BUILDING.City)
 
     def place_street(self, G: T.Board, index: int):
-        add_connection(G, self, index, T.ROADS.Placed)
+        add_connection(G, self, index, T.CONNECTION.Road)

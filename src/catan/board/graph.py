@@ -111,7 +111,7 @@ def create_tiles(
                         cnt_tile,
                         {
                             "type": "tile",
-                            "node_type": T.NODE_TYPES.Missing,
+                            "node_type": T.TILE_TYPE.Missing,
                             "dice_value": -1,
                             "coor": (x, y),
                         },
@@ -169,7 +169,7 @@ def create_empty_buildings(
                     cnt_buildings,
                     {
                         "type": "building",
-                        "bulding_type": T.BUILDINGS.Missing,
+                        "bulding_type": T.BUILDING.Missing,
                         "coor": x,
                     },
                 )
@@ -217,7 +217,7 @@ def create_empty_streets(
                 y,
                 label={
                     "type": "street",
-                    "street_type": T.ROADS.Missing,
+                    "street_type": T.CONNECTION.Missing,
                     "coor": [x, y],
                 },
             )
