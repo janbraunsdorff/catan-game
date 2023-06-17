@@ -40,3 +40,27 @@ def get_ressources_of_player_list(G: T.Board, player: Player) -> List[T.RESSOURC
     ressources = [G.nodes[rn]["ressource"] for rn in ressource_nodes]
 
     return ressources
+
+
+def remove_ressource_from_player(
+    G: T.Board, player: Player, ressource: T.RESSOURCES
+) -> T.Board:
+    idx, data = get_player_node_by_color(G, player)
+    edges = G.edges(idx, data=True)
+
+    ressource_nodes = [
+        (u, v)
+        for u, v, x in edges
+        if x["type"] == "ressource_ownership" and G.nodes[v]["ressource"] == ressource
+    ]
+
+    if len(ressource_nodes) <= 0:
+        raise ValueError("Ressource not available to remove")
+
+    resource_node = ressource_nodes[0][1]
+    plyaer_node = ressource_nodes[0][0]
+
+    G.remove_edge(plyaer_node, resource_node)
+    G.remove_node(resource_node)
+
+    return G
