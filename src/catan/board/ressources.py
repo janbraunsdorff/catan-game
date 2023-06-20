@@ -19,7 +19,7 @@ def add_ressource_to_player(
     ressource_id = str(uuid4())
 
     G.add_node(ressource_id, type="ressource", ressource=ressource)
-    G.add_edge(idx, ressource_id, type="ressource_ownership")
+    G.add_edge(idx, ressource_id, type=T.EdgeType.RESSOURCE_OWNERSHIP)
 
     return G
 
@@ -36,7 +36,9 @@ def get_ressources_of_player_list(G: T.Board, player: Player) -> List[T.RESSOURC
     idx, data = get_player_node_by_color(G, player)
     edges = G.edges(idx, data=True)
 
-    ressource_nodes = [r for _, r, x in edges if x["type"] == "ressource_ownership"]
+    ressource_nodes = [
+        r for _, r, x in edges if x["type"] == T.EdgeType.RESSOURCE_OWNERSHIP
+    ]
     ressources = [G.nodes[rn]["ressource"] for rn in ressource_nodes]
 
     return ressources
@@ -51,7 +53,8 @@ def remove_ressource_from_player(
     ressource_nodes = [
         (u, v)
         for u, v, x in edges
-        if x["type"] == "ressource_ownership" and G.nodes[v]["ressource"] == ressource
+        if x["type"] == T.EdgeType.RESSOURCE_OWNERSHIP
+        and G.nodes[v]["ressource"] == ressource
     ]
 
     if len(ressource_nodes) <= 0:

@@ -182,7 +182,10 @@ def create_empty_buildings(
                 G.add_edge(
                     tile,
                     cnt_buildings,
-                    label={"type": "produce_to", "corr": [tile, cnt_buildings]},
+                    label={
+                        "type": T.EdgeType.PRODUCE_TO,
+                        "corr": [tile, cnt_buildings],
+                    },
                 )
 
         corr_to_index[x] = cnt_buildings
@@ -216,7 +219,7 @@ def create_empty_streets(
                 x,
                 y,
                 label={
-                    "type": "street",
+                    "type": T.EdgeType.STREET,
                     "street_type": T.CONNECTION.Missing,
                     "coor": [x, y],
                 },

@@ -59,5 +59,11 @@ class COLOR(Enum):
     ORANGE = 4
 
 
+class EdgeType(Enum):
+    PRODUCE_TO = "produce_to"
+    STREET = "street"
+    RESSOURCE_OWNERSHIP = "resource_ownership"
+
+
 # TODO: edege types
 # TODO  node type
