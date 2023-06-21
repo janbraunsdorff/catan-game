@@ -38,7 +38,7 @@ class BoardBuilder:
 
 
 def add_player(G: T.Board, player: Player) -> T.Board:
-    G.add_node(player.color, type="player")
+    G.add_node(player.color, type=T.NODE_TYPE.PLAYER)
     return G
 
 
@@ -110,7 +110,7 @@ def create_tiles(
                     (
                         cnt_tile,
                         {
-                            "type": "tile",
+                            "type": T.NODE_TYPE.TILE,
                             "node_type": T.TILE_TYPE.Missing,
                             "dice_value": -1,
                             "coor": (x, y),
@@ -168,7 +168,7 @@ def create_empty_buildings(
                 (
                     cnt_buildings,
                     {
-                        "type": "building",
+                        "type": T.NODE_TYPE.BUILDING,
                         "bulding_type": T.BUILDING.Missing,
                         "coor": x,
                     },
@@ -183,7 +183,7 @@ def create_empty_buildings(
                     tile,
                     cnt_buildings,
                     label={
-                        "type": T.EdgeType.PRODUCE_TO,
+                        "type": T.EDGE_TYPE.PRODUCE_TO,
                         "corr": [tile, cnt_buildings],
                     },
                 )
@@ -219,7 +219,7 @@ def create_empty_streets(
                 x,
                 y,
                 label={
-                    "type": T.EdgeType.STREET,
+                    "type": T.EDGE_TYPE.STREET,
                     "street_type": T.CONNECTION.Missing,
                     "coor": [x, y],
                 },

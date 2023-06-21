@@ -16,14 +16,22 @@ def test_add_one_ressource():
     board = BoardBuilder().create_board_of_size([1, 2, 1]).with_player(player).build()
 
     len_before = len([x for x, y in board.nodes(data=True)])
-    assert len([x for x, y in board.nodes(data=True) if y["type"] == "player"]) == 1
-    assert len([x for x, y in board.nodes(data=True) if y["type"] == "tile"]) == 4
+    assert (
+        len([x for x, y in board.nodes(data=True) if y["type"] == T.NODE_TYPE.PLAYER])
+        == 1
+    )
+    assert (
+        len([x for x, y in board.nodes(data=True) if y["type"] == T.NODE_TYPE.TILE])
+        == 4
+    )
 
     board = R.add_ressource_to_player(board, player, T.RESSOURCE.Brick)
 
     assert len([x for x, y in board.nodes(data=True)]) == (len_before + 1)
 
-    ressource = [(x, y) for x, y in board.nodes(data=True) if y["type"] == "ressource"]
+    ressource = [
+        (x, y) for x, y in board.nodes(data=True) if y["type"] == T.NODE_TYPE.RESSOURCE
+    ]
 
     assert len(ressource) == 1
     assert ressource[0][1]["ressource"] == T.RESSOURCE.Brick
@@ -34,8 +42,14 @@ def test_add_multible_ressource():
     board = BoardBuilder().create_board_of_size([1, 2, 1]).with_player(player).build()
 
     len_before = len([x for x, y in board.nodes(data=True)])
-    assert len([x for x, y in board.nodes(data=True) if y["type"] == "player"]) == 1
-    assert len([x for x, y in board.nodes(data=True) if y["type"] == "tile"]) == 4
+    assert (
+        len([x for x, y in board.nodes(data=True) if y["type"] == T.NODE_TYPE.PLAYER])
+        == 1
+    )
+    assert (
+        len([x for x, y in board.nodes(data=True) if y["type"] == T.NODE_TYPE.TILE])
+        == 4
+    )
 
     board = R.add_ressources_to_player(
         board, player, [T.RESSOURCE.Brick, T.RESSOURCE.Wool]
@@ -43,7 +57,9 @@ def test_add_multible_ressource():
 
     assert len([x for x, y in board.nodes(data=True)]) == (len_before + 2)
 
-    ressource = [(x, y) for x, y in board.nodes(data=True) if y["type"] == "ressource"]
+    ressource = [
+        (x, y) for x, y in board.nodes(data=True) if y["type"] == T.NODE_TYPE.RESSOURCE
+    ]
 
     assert len(ressource) == 2
     assert T.RESSOURCE.Brick in [ressource[x][1]["ressource"] for x in range(2)]
@@ -62,8 +78,14 @@ def test_add_one_ressource_for_two_player():
     )
 
     len_before = len([x for x, y in board.nodes(data=True)])
-    assert len([x for x, y in board.nodes(data=True) if y["type"] == "player"]) == 2
-    assert len([x for x, y in board.nodes(data=True) if y["type"] == "tile"]) == 4
+    assert (
+        len([x for x, y in board.nodes(data=True) if y["type"] == T.NODE_TYPE.PLAYER])
+        == 2
+    )
+    assert (
+        len([x for x, y in board.nodes(data=True) if y["type"] == T.NODE_TYPE.TILE])
+        == 4
+    )
 
     board = R.add_ressource_to_player(board, player_a, T.RESSOURCE.Brick)
     board = R.add_ressource_to_player(board, player_b, T.RESSOURCE.Lumber)
