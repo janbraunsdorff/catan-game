@@ -21,13 +21,14 @@ def add_building(
     founding: bool = False,
 ) -> None:
     _pass_or_raise_number_of_buildings(G=G, player=player, building=building)
+    _pass_or_raise_node_type_to_place(G=G, index=index)
 
     if building == T.BUILDING.SETTELMENT:
         _pass_or_raise_can_place_settelment(G=G, index=index)
 
     if building == T.BUILDING.CITY:
         _pass_or_raise_can_place_city(G=G, player=player, index=index)
-    # if city, settelment must be placed first
+
     # player must own ressources if not founding
     # next bulding must be at least corssroads away
 
@@ -67,8 +68,6 @@ def _pass_or_raise_number_of_buildings(
 
 
 def _pass_or_raise_can_place_settelment(G: T.Board, index: int):
-    _pass_or_raise_node_type_to_place(G=G, index=index)
-
     node = G.nodes[index]
 
     if node["bulding_type"] != T.BUILDING.MISSING:
@@ -78,8 +77,6 @@ def _pass_or_raise_can_place_settelment(G: T.Board, index: int):
 
 
 def _pass_or_raise_can_place_city(G: T.Board, player: Player, index: int):
-    _pass_or_raise_node_type_to_place(G=G, index=index)
-
     node = G.nodes[index]
     if node["bulding_type"] != T.BUILDING.SETTELMENT:
         raise PlaceNotAllowed(
