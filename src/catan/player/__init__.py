@@ -14,7 +14,7 @@ class Player(ABC):
         return self._color
 
     def place_settelment(self, G: T.Board, index: int):
-        add_building(G, self, index, T.BUILDING.Settelment)
+        add_building(G, self, index, T.BUILDING.SETTELMENT)
 
     def place_city(self, G: T.Board, index: int):
         add_building(G, self, index, T.BUILDING.City)

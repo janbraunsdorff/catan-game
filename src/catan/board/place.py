@@ -21,7 +21,8 @@ def add_building(
     building: T.BUILDING,
     founding: bool = False,
 ) -> None:
-    # not more than 4 settelment already exits
+    # not more than 5 settelment already exits
+
     # not more than 3 cities already exits
     # no exiting buiding from other players
     # if city, settelment must be placed first

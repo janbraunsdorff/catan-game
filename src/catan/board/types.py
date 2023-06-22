@@ -44,7 +44,7 @@ class CONNECTION(Enum):
 
 class BUILDING(Enum):
     Missing = 1
-    Settelment = 2
+    SETTELMENT = 2
     City = 3
 
 
@@ -64,6 +64,7 @@ class EDGE_TYPE(Enum):
     PORT_TO = "port_to"
     STREET = "street"
     RESSOURCE_OWNERSHIP = "resource_ownership"
+    SETTELMENT_OWNERSHIP = "settelment_ownership"
 
 
 class NODE_TYPE(Enum):
