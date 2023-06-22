@@ -43,9 +43,9 @@ class CONNECTION(Enum):
 
 
 class BUILDING(Enum):
-    Missing = 1
-    SETTELMENT = 2
-    City = 3
+    MISSING = "missing"
+    SETTELMENT = "settelement"
+    CITY = "city"
 
 
 Coor = Tuple[float, float]
@@ -53,10 +53,10 @@ Board = Graph
 
 
 class COLOR(Enum):
-    RED = 1
-    BLUE = 2
-    WHITE = 3
-    ORANGE = 4
+    RED = "red"
+    BLUE = "blue"
+    WHITE = "white"
+    ORANGE = "orange"
 
 
 class EDGE_TYPE(Enum):
@@ -65,6 +65,7 @@ class EDGE_TYPE(Enum):
     STREET = "street"
     RESSOURCE_OWNERSHIP = "resource_ownership"
     SETTELMENT_OWNERSHIP = "settelment_ownership"
+    CITY_ONWERSHIP = "city_ownership"
 
 
 class NODE_TYPE(Enum):

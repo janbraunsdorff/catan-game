@@ -17,7 +17,7 @@ class Player(ABC):
         add_building(G, self, index, T.BUILDING.SETTELMENT)
 
     def place_city(self, G: T.Board, index: int):
-        add_building(G, self, index, T.BUILDING.City)
+        add_building(G, self, index, T.BUILDING.CITY)
 
     def place_street(self, G: T.Board, index: int):
         add_connection(G, self, index, T.CONNECTION.Road)

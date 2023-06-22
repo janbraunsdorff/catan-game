@@ -196,7 +196,7 @@ def create_empty_buildings(
                     cnt_buildings,
                     {
                         "type": T.NODE_TYPE.BUILDING,
-                        "bulding_type": T.BUILDING.Missing,
+                        "bulding_type": T.BUILDING.MISSING,
                         "coor": x,
                     },
                 )
