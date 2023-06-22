@@ -10,8 +10,8 @@ class Player(ABC):
         self._color: T.COLOR = color
 
     @property
-    def color(self) -> T.COLOR:
-        return self._color
+    def color(self) -> str:
+        return self._color.value
 
     def place_settelment(self, G: T.Board, index: int):
         add_building(G, self, index, T.BUILDING.SETTELMENT)

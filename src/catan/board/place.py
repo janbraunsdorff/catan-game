@@ -91,9 +91,9 @@ def _pass_or_raise_can_place_city(G: T.Board, player: Player, index: int):
         y for x, y, val in edges if val["type"] == T.EDGE_TYPE.SETTELMENT_OWNERSHIP
     ][0]
 
-    if owner != player.color.value:
+    if owner != player.color:
         raise PlaceNotAllowed(
-            f"Can not upgrade settlement. Target settelment is of player '{owner}'. You are '{player.color.value}'"
+            f"Can not upgrade settlement. Target settelment is of player '{owner}'. You are '{player.color}'"
         )
 
 

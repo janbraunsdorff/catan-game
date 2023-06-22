@@ -69,7 +69,7 @@ def add_player(G: T.Board, player: Player) -> T.Board:
     return G
 
 
-def get_player_node_by_color(G: T.Board, player: Player) -> Tuple[T.COLOR, dict]:
+def get_player_node_by_color(G: T.Board, player: Player) -> Tuple[str, dict]:
     color = player.color
     return color, G.nodes[color]
 

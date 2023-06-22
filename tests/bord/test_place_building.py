@@ -174,7 +174,7 @@ def test_place_city_only_if_own_settelment_was_placed():
 
     G.add_node(100, type=T.NODE_TYPE.BUILDING, bulding_type=T.BUILDING.SETTELMENT)
 
-    G.add_edge(player_a.color.value, 100, type=T.EDGE_TYPE.SETTELMENT_OWNERSHIP)
+    G.add_edge(player_a.color, 100, type=T.EDGE_TYPE.SETTELMENT_OWNERSHIP)
 
     with pytest.raises(PlaceNotAllowed) as e:
         add_building(
