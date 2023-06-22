@@ -67,14 +67,10 @@ def _pass_or_raise_number_of_buildings(
 
 
 def _pass_or_raise_can_place_settelment(G: T.Board, index: int):
-    if index not in G:
-        raise PlaceNotAllowed(f"Node with index {index} not exits")
+    _pass_or_raise_node_type_to_place(G=G, index=index)
 
     node = G.nodes[index]
-    if node["type"] != T.NODE_TYPE.BUILDING:
-        raise PlaceNotAllowed(
-            f"Can not place building to node of type { node['type']}. Allowd is only NODE_TYPE.BUILDING"
-        )
+
     if node["bulding_type"] != T.BUILDING.MISSING:
         raise PlaceNotAllowed(
             f"Can not place building to an already build node. Current buiding type {node['bulding_type']}"
@@ -82,15 +78,9 @@ def _pass_or_raise_can_place_settelment(G: T.Board, index: int):
 
 
 def _pass_or_raise_can_place_city(G: T.Board, player: Player, index: int):
-    if index not in G:
-        raise PlaceNotAllowed(f"Node with index {index} not exits")
+    _pass_or_raise_node_type_to_place(G=G, index=index)
 
     node = G.nodes[index]
-    if node["type"] != T.NODE_TYPE.BUILDING:
-        raise PlaceNotAllowed(
-            f"Can not place building to node of type { node['type']}. Allowd is only NODE_TYPE.BUILDING"
-        )
-
     if node["bulding_type"] != T.BUILDING.SETTELMENT:
         raise PlaceNotAllowed(
             f"Can not upgrade settlement. Target Node is not any settelment, got: {node['bulding_type']}"
@@ -104,4 +94,15 @@ def _pass_or_raise_can_place_city(G: T.Board, player: Player, index: int):
     if owner != player.color.value:
         raise PlaceNotAllowed(
             f"Can not upgrade settlement. Target settelment is of player '{owner}'. You are '{player.color.value}'"
+        )
+
+
+def _pass_or_raise_node_type_to_place(G: T.Board, index: int):
+    if index not in G:
+        raise PlaceNotAllowed(f"Node with index {index} not exits")
+
+    node = G.nodes[index]
+    if node["type"] != T.NODE_TYPE.BUILDING:
+        raise PlaceNotAllowed(
+            f"Can not place building to node of type { node['type']}. Allowd is only NODE_TYPE.BUILDING"
         )
