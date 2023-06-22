@@ -61,6 +61,7 @@ class COLOR(Enum):
 
 class EDGE_TYPE(Enum):
     PRODUCE_TO = "produce_to"
+    PORT_TO = "port_to"
     STREET = "street"
     RESSOURCE_OWNERSHIP = "resource_ownership"
 
@@ -70,3 +71,13 @@ class NODE_TYPE(Enum):
     TILE = "tile"
     BUILDING = "building"
     RESSOURCE = "resource"
+    PORT = "port"
+
+
+class PORT_TYPE(Enum):
+    PORT_ANY = "port_3_any"
+    PORT_WOOL = "port_wool"
+    PORT_WOOD = "port_wood"
+    PORT_GRAIN = "port_grain"
+    PORT_ORE = "port_ore"
+    PORT_BRICK = "port_brick"

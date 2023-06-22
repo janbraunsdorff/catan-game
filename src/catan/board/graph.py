@@ -5,6 +5,8 @@ Examples:
 
 GameBuilder()
     .create_board_of_size([3,4,5,3,4])
+    .with_port(...)
+    .with_port(...)
     .with_player(...)
     .with_player(...)
     .with_player(...)
@@ -13,9 +15,9 @@ GameBuilder()
 """
 
 from typing import Dict, List, Self, Tuple
+from uuid import uuid4
 
 import networkx as nx
-from networkx.classes.reportviews import NodeView
 
 import catan.board.types as T
 from catan.player import Player
@@ -33,8 +35,33 @@ class BoardBuilder:
         self.board = add_player(self.board, player)
         return self
 
+    def with_port(self, port_type: T.PORT_TYPE, buildings: Tuple[int, int]) -> Self:
+        self.board = add_port(self.board, port_type=port_type, buildings=buildings)
+        return self
+
     def build(self) -> T.Board:
         return self.board
+
+
+def add_port(G: T.Board, port_type: T.PORT_TYPE, buildings: Tuple[int, int]) -> T.Board:
+    if buildings[0] not in G or buildings[1] not in G:
+        raise ValueError(f"No bulding found for idx {buildings[0]}")
+
+    port_idx = str(uuid4())
+    G.add_node(port_idx, type=T.NODE_TYPE.PORT, port_type=port_type)
+
+    G.add_edge(
+        port_idx,
+        buildings[0],
+        type=T.EDGE_TYPE.PORT_TO,
+    )
+
+    G.add_edge(
+        port_idx,
+        buildings[1],
+        type=T.EDGE_TYPE.PORT_TO,
+    )
+    return G
 
 
 def add_player(G: T.Board, player: Player) -> T.Board:
