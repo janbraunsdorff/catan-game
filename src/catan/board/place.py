@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING, Dict, List, Tuple
 if TYPE_CHECKING:
     from catan.player import Player
 
-import catan.board.types as T
+from catan.board import types as T
+from catan.board.ressources import get_ressources_of_player_dict
 
 
 class PlaceNotAllowed(Exception):
@@ -25,11 +26,12 @@ def add_building(
 
     if building == T.BUILDING.SETTELMENT:
         _pass_or_raise_can_place_settelment(G=G, index=index)
+        _pass_or_raise_has_enough_ressources_for_settelment(G=G, player=player)
 
     if building == T.BUILDING.CITY:
         _pass_or_raise_can_place_city(G=G, player=player, index=index)
+        _pass_or_raise_has_enough_ressources_for_city(G=G, player=player)
 
-    # player must own ressources if not founding
     # next bulding must be at least corssroads away
 
     # update node
@@ -65,6 +67,38 @@ def _pass_or_raise_number_of_buildings(
     )
     if len(buildings) >= max_num:
         raise PlaceNotAllowed(f"Too many {building} already exits")
+
+
+def _pass_or_raise_has_enough_ressources_for_settelment(G: T.Board, player: Player):
+    ressources = get_ressources_of_player_dict(G=G, player=player)
+    currently_avible = set(ressources.keys())
+
+    requiretemtns = set(
+        [T.RESSOURCE.Brick, T.RESSOURCE.Wool, T.RESSOURCE.Grain, T.RESSOURCE.Lumber]
+    )
+
+    remaining = requiretemtns - currently_avible
+
+    if len(remaining) >= 1:
+        raise PlaceNotAllowed(
+            f"Not enough resources. Player {player.color} as only {ressources}. Missing {remaining}"
+        )
+
+
+def _pass_or_raise_has_enough_ressources_for_city(G: T.Board, player: Player):
+    ressources = get_ressources_of_player_dict(G=G, player=player)
+    error = PlaceNotAllowed(
+        f"Not enough resources. Player {player.color} as only {ressources}"
+    )
+
+    if T.RESSOURCE.Grain not in ressources or T.RESSOURCE.Ore not in ressources:
+        raise error
+
+    if ressources[T.RESSOURCE.Grain] < 2:
+        raise error
+
+    if ressources[T.RESSOURCE.Ore] < 3:
+        raise error
 
 
 def _pass_or_raise_can_place_settelment(G: T.Board, index: int):

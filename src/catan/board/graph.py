@@ -14,13 +14,19 @@ GameBuilder()
 
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from catan.player import Player
+
 from typing import Dict, List, Self, Tuple
 from uuid import uuid4
 
 import networkx as nx
 
-import catan.board.types as T
-from catan.player import Player
+from catan.board import types as T
 
 
 class BoardBuilder:

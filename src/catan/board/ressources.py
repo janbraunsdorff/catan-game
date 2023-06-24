@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from catan.player import Player
 
-from typing import List
+from collections import Counter
+from typing import Dict, List
 from uuid import uuid4
 
 import catan.board.types as T
@@ -42,6 +43,11 @@ def get_ressources_of_player_list(G: T.Board, player: Player) -> List[T.RESSOURC
     ressources = [G.nodes[rn]["ressource"] for rn in ressource_nodes]
 
     return ressources
+
+
+def get_ressources_of_player_dict(G: T.Board, player: Player) -> Dict[T.RESSOURCE, int]:
+    ressources = get_ressources_of_player_list(G, player)
+    return {k: x for k, x in Counter(ressources).items()}
 
 
 def remove_ressource_from_player(

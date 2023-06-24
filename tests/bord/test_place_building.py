@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 import networkx as nx
 import pytest
 
@@ -185,3 +187,74 @@ def test_place_city_only_if_own_settelment_was_placed():
         e.value.args[0]
         == "Can not upgrade settlement. Target settelment is of player 'blue'. You are 'red'"
     )
+
+
+@pytest.mark.parametrize(
+    "ressources",
+    (
+        [],
+        [T.RESSOURCE.Brick],
+        [T.RESSOURCE.Brick, T.RESSOURCE.Wool],
+        [T.RESSOURCE.Brick, T.RESSOURCE.Lumber],
+        [T.RESSOURCE.Brick, T.RESSOURCE.Lumber, T.RESSOURCE.Wool],
+        [T.RESSOURCE.Brick, T.RESSOURCE.Lumber, T.RESSOURCE.Wool, T.RESSOURCE.Wool],
+        [T.RESSOURCE.Brick, T.RESSOURCE.Lumber, T.RESSOURCE.Grain],
+        [T.RESSOURCE.Brick, T.RESSOURCE.Lumber, T.RESSOURCE.Wool, T.RESSOURCE.Ore],
+    ),
+)
+def test_place_settelment_to_low_ressources(ressources):
+    G = nx.Graph()
+
+    player = TestPlayer(T.COLOR.BLUE)
+    G.add_node(player.color, type=T.NODE_TYPE.PLAYER)
+    G.add_node(100, type=T.NODE_TYPE.BUILDING, bulding_type=T.BUILDING.MISSING)
+
+    for r in ressources:
+        ressource_id = str(uuid4())
+
+        G.add_node(ressource_id, type=T.NODE_TYPE.RESSOURCE, ressource=r)
+        G.add_edge(player.color, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP)
+
+    with pytest.raises(PlaceNotAllowed) as e:
+        add_building(
+            G, player=player, index=100, building=T.BUILDING.SETTELMENT, founding=False
+        )
+
+
+@pytest.mark.parametrize(
+    "ressources",
+    (
+        [],
+        [T.RESSOURCE.Brick],
+        [T.RESSOURCE.Brick, T.RESSOURCE.Lumber, T.RESSOURCE.Wool],
+        [T.RESSOURCE.Brick, T.RESSOURCE.Lumber, T.RESSOURCE.Wool, T.RESSOURCE.Wool],
+        [T.RESSOURCE.Brick, T.RESSOURCE.Lumber, T.RESSOURCE.Wool, T.RESSOURCE.Ore],
+        [T.RESSOURCE.Grain, T.RESSOURCE.Grain, T.RESSOURCE.Ore, T.RESSOURCE.Ore],
+        [
+            T.RESSOURCE.Grain,
+            T.RESSOURCE.Grain,
+            T.RESSOURCE.Grain,
+            T.RESSOURCE.Ore,
+            T.RESSOURCE.Ore,
+        ],
+        [T.RESSOURCE.Grain, T.RESSOURCE.Ore, T.RESSOURCE.Ore, T.RESSOURCE.Ore],
+    ),
+)
+def test_place_citiy_to_low_ressources(ressources):
+    G = nx.Graph()
+
+    player = TestPlayer(T.COLOR.BLUE)
+    G.add_node(player.color, type=T.NODE_TYPE.PLAYER)
+    G.add_node(100, type=T.NODE_TYPE.BUILDING, bulding_type=T.BUILDING.SETTELMENT)
+    G.add_edge(player.color, 100, type=T.EDGE_TYPE.SETTELMENT_OWNERSHIP)
+
+    for r in ressources:
+        ressource_id = str(uuid4())
+
+        G.add_node(ressource_id, type=T.NODE_TYPE.RESSOURCE, ressource=r)
+        G.add_edge(player.color, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP)
+
+    with pytest.raises(PlaceNotAllowed) as e:
+        add_building(
+            G, player=player, index=100, building=T.BUILDING.CITY, founding=False
+        )
