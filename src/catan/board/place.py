@@ -6,7 +6,10 @@ if TYPE_CHECKING:
     from catan.player import Player
 
 from catan.board import types as T
-from catan.board.ressources import get_ressources_of_player_dict
+from catan.board.ressources import (
+    get_ressources_of_player_dict,
+    remove_ressource_from_player,
+)
 
 
 class PlaceNotAllowed(Exception):
@@ -20,23 +23,53 @@ def add_building(
     index: int,
     building: T.BUILDING,
     founding: bool = False,
+    raise_on_error: bool = True,
 ) -> None:
+    try:
+        check_building(G, player, index, building, founding)
+    except PlaceNotAllowed as e:
+        if raise_on_error:
+            raise e
+        return
+
+    G.nodes[index]["bulding_type"] = building
+
+    if building == T.BUILDING.CITY:
+        G.add_edge(player.color, index, type=T.EDGE_TYPE.CITY_ONWERSHIP)
+        remove_ressource_from_player(G, player, T.RESSOURCE.Grain)
+        remove_ressource_from_player(G, player, T.RESSOURCE.Grain)
+        remove_ressource_from_player(G, player, T.RESSOURCE.Ore)
+        remove_ressource_from_player(G, player, T.RESSOURCE.Ore)
+        remove_ressource_from_player(G, player, T.RESSOURCE.Ore)
+
+    elif building == T.BUILDING.SETTELMENT:
+        G.add_edge(player.color, index, type=T.EDGE_TYPE.SETTELMENT_OWNERSHIP)
+        if not founding:
+            remove_ressource_from_player(G, player, T.RESSOURCE.Brick)
+            remove_ressource_from_player(G, player, T.RESSOURCE.Wool)
+            remove_ressource_from_player(G, player, T.RESSOURCE.Lumber)
+            remove_ressource_from_player(G, player, T.RESSOURCE.Grain)
+
+
+def check_building(
+    G: T.Board, player: Player, index: int, building: T.BUILDING, founding: bool
+):
     _pass_or_raise_number_of_buildings(G=G, player=player, building=building)
     _pass_or_raise_node_type_to_place(G=G, index=index)
 
     if building == T.BUILDING.SETTELMENT:
         _pass_or_raise_can_place_settelment(G=G, index=index)
-        _pass_or_raise_has_enough_ressources_for_settelment(G=G, player=player)
+        _pass_or_raise_has_enough_ressources_for_settelment(
+            G=G, player=player, founding=founding
+        )
+        _pass_or_raise_buldings_are_to_close(G=G, index=index)
+        _pass_or_raise_building_not_connected_to_street(
+            G=G, player=player, index=index, founding=founding
+        )
 
     if building == T.BUILDING.CITY:
         _pass_or_raise_can_place_city(G=G, player=player, index=index)
         _pass_or_raise_has_enough_ressources_for_city(G=G, player=player)
-
-    # next bulding must be at least corssroads away
-
-    # update node
-    # add between node an player
-    raise NotImplementedError()
 
 
 def add_connection(
@@ -50,6 +83,39 @@ def get_buildings_of_player(
 ) -> List[Dict]:
     edges = G.edges(player.color, data=True)
     return [val for x, y, val in edges if val["type"] == connection_type]
+
+
+def _pass_or_raise_building_not_connected_to_street(
+    G: T.Board, player: Player, index: int, founding: bool
+):
+    if founding:
+        return
+    edges = G.edges(index, data=True)
+    streets = [
+        s
+        for f, t, s in edges
+        if s["type"] == T.EDGE_TYPE.STREET
+        and s["street_type"] == T.CONNECTION.Road
+        and s["owner"] == player.color
+    ]
+
+    if len(streets) == 0:
+        raise PlaceNotAllowed("Building connects not to an road")
+
+
+def _pass_or_raise_buldings_are_to_close(G: T.Board, index: int):
+    edges = G.edges(index, data=True)
+
+    neighbour_a = [t for f, t, x in edges if x["type"] == T.EDGE_TYPE.STREET]
+
+    neighbour_b = [t for f, t, x in edges if x["type"] == T.EDGE_TYPE.STREET]
+
+    neighbour_a.extend(neighbour_b)
+    neighbours = list(set(neighbour_a))
+
+    for n in neighbours:
+        if G.nodes[n]["bulding_type"] != T.BUILDING.MISSING:
+            raise PlaceNotAllowed("Building too close to another")
 
 
 def _pass_or_raise_number_of_buildings(
@@ -69,7 +135,11 @@ def _pass_or_raise_number_of_buildings(
         raise PlaceNotAllowed(f"Too many {building} already exits")
 
 
-def _pass_or_raise_has_enough_ressources_for_settelment(G: T.Board, player: Player):
+def _pass_or_raise_has_enough_ressources_for_settelment(
+    G: T.Board, player: Player, founding: bool
+):
+    if founding:
+        return
     ressources = get_ressources_of_player_dict(G=G, player=player)
     currently_avible = set(ressources.keys())
 
