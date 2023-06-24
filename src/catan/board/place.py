@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict, List, Tuple
 
 if TYPE_CHECKING:
-    from catan.player import Player
+    from catan.player import Player  # pragma: no cover
 
 from catan.board import types as T
 from catan.board.ressources import (

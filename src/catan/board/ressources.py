@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from catan.player import Player
+    from catan.player import Player  # pragma: no cover
 
 from collections import Counter
 from typing import Dict, List
