@@ -606,3 +606,203 @@ def test_trate_ressources_2_1_sucessfull_different_ports(input_, output, port):
     assert output in R.get_ressources_of_player_dict(G, player)
     assert R.get_ressources_of_player_dict(G, player)[input_] == 2
     assert R.get_ressources_of_player_dict(G, player)[output] == 1
+
+
+@pytest.mark.parametrize(
+    "ressources_a,ressources_b",
+    [
+        ([T.RESSOURCE.Brick], [T.RESSOURCE.Grain]),
+        ([T.RESSOURCE.Wool], [T.RESSOURCE.Ore]),
+        ([T.RESSOURCE.Ore], [T.RESSOURCE.Lumber]),
+        ([T.RESSOURCE.Grain], [T.RESSOURCE.Wool]),
+        ([T.RESSOURCE.Grain, T.RESSOURCE.Brick], [T.RESSOURCE.Wool]),
+        ([T.RESSOURCE.Grain, T.RESSOURCE.Lumber], [T.RESSOURCE.Wool, T.RESSOURCE.Ore]),
+    ],
+)
+def test_trate_between_player(ressources_a, ressources_b):
+    player_a = TestPlayer(T.COLOR.BLUE)
+    player_b = TestPlayer(T.COLOR.RED)
+
+    G = (
+        BoardBuilder()
+        .create_board_of_size([1])
+        .with_player(player_a)
+        .with_player(player_b)
+        .build()
+    )
+
+    for r in ressources_a:
+        ressource_id = str(uuid4())
+        G.add_node(ressource_id, type=T.NODE_TYPE.RESSOURCE, ressource=r)
+        G.add_edge(player_a.color, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP)
+
+    for r in ressources_b:
+        ressource_id = str(uuid4())
+        G.add_node(ressource_id, type=T.NODE_TYPE.RESSOURCE, ressource=r)
+        G.add_edge(player_b.color, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP)
+
+    num_nodes = len(G.nodes())
+    num_edges = len(G.edges())
+
+    done = R.player_trate(
+        G,
+        player_a=player_a,
+        player_b=player_b,
+        ressource_a=ressources_a,
+        ressource_b=ressources_b,
+    )
+
+    assert done
+
+    assert len(G.nodes()) == num_nodes
+    assert len(G.edges()) == num_edges
+
+    for r in ressources_b:
+        assert r in R.get_ressources_of_player_dict(G, player_a)
+
+    for r in ressources_a:
+        assert r in R.get_ressources_of_player_dict(G, player_b)
+
+
+@pytest.mark.parametrize(
+    "ressources_a,ressources_b",
+    [
+        ([T.RESSOURCE.Brick], [T.RESSOURCE.Grain]),
+        ([T.RESSOURCE.Wool], [T.RESSOURCE.Ore]),
+        ([T.RESSOURCE.Ore], [T.RESSOURCE.Lumber]),
+        ([T.RESSOURCE.Grain], [T.RESSOURCE.Wool]),
+        ([T.RESSOURCE.Grain, T.RESSOURCE.Brick], [T.RESSOURCE.Wool]),
+        ([T.RESSOURCE.Grain, T.RESSOURCE.Lumber], [T.RESSOURCE.Wool, T.RESSOURCE.Ore]),
+    ],
+)
+def test_trate_between_player_a_has_no_ressources(ressources_a, ressources_b):
+    player_a = TestPlayer(T.COLOR.BLUE)
+    player_b = TestPlayer(T.COLOR.RED)
+
+    G = (
+        BoardBuilder()
+        .create_board_of_size([1])
+        .with_player(player_a)
+        .with_player(player_b)
+        .build()
+    )
+
+    for r in ressources_b:
+        ressource_id = str(uuid4())
+        G.add_node(ressource_id, type=T.NODE_TYPE.RESSOURCE, ressource=r)
+        G.add_edge(player_b.color, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP)
+
+    num_nodes = len(G.nodes())
+    num_edges = len(G.edges())
+
+    done = R.player_trate(
+        G,
+        player_a=player_a,
+        player_b=player_b,
+        ressource_a=ressources_a,
+        ressource_b=ressources_b,
+    )
+
+    assert done == False
+
+    assert len(G.nodes()) == num_nodes
+    assert len(G.edges()) == num_edges
+
+    for r in ressources_b:
+        assert r in R.get_ressources_of_player_dict(G, player_b)
+
+
+@pytest.mark.parametrize(
+    "ressources_a,ressources_b",
+    [
+        ([T.RESSOURCE.Brick], [T.RESSOURCE.Grain]),
+        ([T.RESSOURCE.Wool], [T.RESSOURCE.Ore]),
+        ([T.RESSOURCE.Ore], [T.RESSOURCE.Lumber]),
+        ([T.RESSOURCE.Grain], [T.RESSOURCE.Wool]),
+        ([T.RESSOURCE.Grain, T.RESSOURCE.Brick], [T.RESSOURCE.Wool]),
+        ([T.RESSOURCE.Grain, T.RESSOURCE.Lumber], [T.RESSOURCE.Wool, T.RESSOURCE.Ore]),
+    ],
+)
+def test_trate_between_player_b_has_no_ressources(ressources_a, ressources_b):
+    player_a = TestPlayer(T.COLOR.BLUE)
+    player_b = TestPlayer(T.COLOR.RED)
+
+    G = (
+        BoardBuilder()
+        .create_board_of_size([1])
+        .with_player(player_a)
+        .with_player(player_b)
+        .build()
+    )
+
+    for r in ressources_a:
+        ressource_id = str(uuid4())
+        G.add_node(ressource_id, type=T.NODE_TYPE.RESSOURCE, ressource=r)
+        G.add_edge(player_a.color, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP)
+
+    num_nodes = len(G.nodes())
+    num_edges = len(G.edges())
+
+    done = R.player_trate(
+        G,
+        player_a=player_a,
+        player_b=player_b,
+        ressource_a=ressources_a,
+        ressource_b=ressources_b,
+    )
+
+    assert done == False
+
+    assert len(G.nodes()) == num_nodes
+    assert len(G.edges()) == num_edges
+
+    for r in ressources_a:
+        assert r in R.get_ressources_of_player_dict(G, player_a)
+
+
+@pytest.mark.parametrize(
+    "ressources_a,ressources_b",
+    [
+        ([T.RESSOURCE.Brick], [T.RESSOURCE.Grain]),
+        ([T.RESSOURCE.Wool], [T.RESSOURCE.Ore]),
+        ([T.RESSOURCE.Ore], [T.RESSOURCE.Lumber]),
+        ([T.RESSOURCE.Grain], [T.RESSOURCE.Wool]),
+        ([T.RESSOURCE.Grain, T.RESSOURCE.Brick], [T.RESSOURCE.Wool]),
+        ([T.RESSOURCE.Grain, T.RESSOURCE.Lumber], [T.RESSOURCE.Wool, T.RESSOURCE.Ore]),
+    ],
+)
+def test_trate_between_player_b_has_no_ressources_raise(ressources_a, ressources_b):
+    player_a = TestPlayer(T.COLOR.BLUE)
+    player_b = TestPlayer(T.COLOR.RED)
+
+    G = (
+        BoardBuilder()
+        .create_board_of_size([1])
+        .with_player(player_a)
+        .with_player(player_b)
+        .build()
+    )
+
+    for r in ressources_a:
+        ressource_id = str(uuid4())
+        G.add_node(ressource_id, type=T.NODE_TYPE.RESSOURCE, ressource=r)
+        G.add_edge(player_a.color, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP)
+
+    num_nodes = len(G.nodes())
+    num_edges = len(G.edges())
+
+    with pytest.raises(ValueError):
+        R.player_trate(
+            G,
+            player_a=player_a,
+            player_b=player_b,
+            ressource_a=ressources_a,
+            ressource_b=ressources_b,
+            raise_on_error=True,
+        )
+
+    assert len(G.nodes()) == num_nodes
+    assert len(G.edges()) == num_edges
+
+    for r in ressources_a:
+        assert r in R.get_ressources_of_player_dict(G, player_a)

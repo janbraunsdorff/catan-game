@@ -192,7 +192,45 @@ def post_trate_2_to_1(
     return True
 
 
-def player_trate():
-    # check of number of resources player a
-    # check of number of resources player b
-    pass
+def _check_player_ressouerces(
+    G: T.Board, player: Player, ressource: List[T.RESSOURCE], raise_on_error=False
+) -> bool:
+    ressources_player = get_ressources_of_player_dict(G, player)
+    ressource_dict = {k: x for k, x in Counter(ressource).items()}
+
+    for k in ressource_dict.keys():
+        if ressource_dict[k] > ressources_player.get(k, 0):
+            if raise_on_error:
+                raise ValueError("Not enough resources")
+            return False
+
+    return True
+
+
+def player_trate(
+    G: T.Board,
+    player_a: Player,
+    player_b: Player,
+    ressource_a: List[T.RESSOURCE],
+    ressource_b: List[T.RESSOURCE],
+    raise_on_error=False,
+):
+    if not _check_player_ressouerces(
+        G, player_a, ressource_a, raise_on_error=raise_on_error
+    ):
+        return False
+
+    if not _check_player_ressouerces(
+        G, player_b, ressource_b, raise_on_error=raise_on_error
+    ):
+        return False
+
+    for ressource in ressource_a:
+        remove_ressource_from_player(G, player_a, ressource)
+        add_ressource_to_player(G, player_b, ressource)
+
+    for ressource in ressource_b:
+        remove_ressource_from_player(G, player_b, ressource)
+        add_ressource_to_player(G, player_a, ressource)
+
+    return True
