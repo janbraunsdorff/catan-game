@@ -86,12 +86,43 @@ def check_building(
 
 
 def add_connection(
-    G: T.Board, player: Player, index: int, building: T.CONNECTION
+    G: T.Board, player: Player, node_u: int, node_v: int, building: T.CONNECTION
 ) -> None:
     # check if edge and empty road
-    # check for ressources
-    # update edge
-    raise NotImplementedError()
+    edge = G.edges[node_u, node_v]
+    if edge["type"] != T.EDGE_TYPE.STREET:
+        raise PlaceNotAllowed("Connection is not a street")
+
+    if edge["street_type"] != T.CONNECTION.Missing:
+        raise PlaceNotAllowed("A street alreay exists")
+
+    ressources = get_ressources_of_player_dict(G, player)
+    if T.RESSOURCE.Brick not in ressources or T.RESSOURCE.Lumber not in ressources:
+        raise PlaceNotAllowed("Player has not enough resources")
+
+    # next to building
+    is_connected = False
+    for node in [node_u, node_v]:
+        n = G.nodes[node]
+
+        connecetd_to_building = (
+            get_ownership_of_node(G, node) == player.color
+            and n["bulding_type"] != T.BUILDING.MISSING
+        )
+        connected_to_street = (
+            len(_get_souring_streets_of_street(G=G, player=player, node=node)) > 0
+        )
+
+        is_connected |= connected_to_street or connecetd_to_building
+
+    if not is_connected:
+        raise PlaceNotAllowed("No Street or Building is connected")
+
+    G.edges[node_u, node_v]["owner"] = player.color
+    G.edges[node_u, node_v]["street_type"] = T.CONNECTION.Road
+
+    remove_ressource_from_player(G, player, T.RESSOURCE.Brick)
+    remove_ressource_from_player(G, player, T.RESSOURCE.Lumber)
 
 
 def get_buildings_of_player(
@@ -99,6 +130,39 @@ def get_buildings_of_player(
 ) -> List[Dict]:
     edges = G.edges(player.color, data=True)
     return [val for x, y, val in edges if val["type"] == connection_type]
+
+
+def get_ownership_of_node(G: T.Board, node_index: int) -> str:
+    edges = G.edges(node_index, data=True)
+    a = [
+        u
+        for u, v, x in edges
+        if x["type"] == T.EDGE_TYPE.CITY_ONWERSHIP
+        or x["type"] == T.EDGE_TYPE.SETTELMENT_OWNERSHIP
+    ]
+    b = [
+        v
+        for u, v, x in edges
+        if x["type"] == T.EDGE_TYPE.CITY_ONWERSHIP
+        or x["type"] == T.EDGE_TYPE.SETTELMENT_OWNERSHIP
+    ]
+
+    a.extend(b)
+
+    players = [x for x in a if G.nodes[x]["type"] == T.NODE_TYPE.PLAYER]
+    if len(players) == 0:
+        return ""
+
+    return players[0]
+
+
+def _get_souring_streets_of_street(G: T.Board, player: Player, node: int):
+    edges = [
+        (u, v, x)
+        for u, v, x in G.edges(node, data=True)
+        if x["type"] == T.EDGE_TYPE.STREET and x["owner"] == player.color
+    ]
+    return edges
 
 
 def _pass_or_raise_building_not_connected_to_street(
