@@ -160,10 +160,36 @@ def post_trate_3_to_1(
     return True
 
 
-def port_trate_2_to_1():
-    # check for port
-    # check of number of resources
-    pass
+def post_trate_2_to_1(
+    G: T.Board,
+    player: Player,
+    ressource: T.RESSOURCE,
+    output: T.RESSOURCE,
+    raise_on_error: bool = False,
+):
+    ressource_to_port = {
+        T.RESSOURCE.Brick: T.PORT.Brick,
+        T.RESSOURCE.Lumber: T.PORT.Lumber,
+        T.RESSOURCE.Wool: T.PORT.Wool,
+        T.RESSOURCE.Ore: T.PORT.Ore,
+        T.RESSOURCE.Grain: T.PORT.Grain,
+    }
+
+    if not player_has_port(G, player, ressource_to_port[ressource]):
+        if raise_on_error:
+            raise ValueError("Player has no 2:1 port claimed")
+        else:
+            return False
+
+    if not check_ressources(G, player, ressource, 2, raise_on_error=raise_on_error):
+        return False
+
+    for _ in range(2):
+        remove_ressource_from_player(G, player, ressource)
+
+    add_ressource_to_player(G, player, output)
+
+    return True
 
 
 def player_trate():
