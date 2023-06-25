@@ -75,9 +75,32 @@ def remove_ressource_from_player(
     return G
 
 
-def port_trate_4_to_1():
-    # check of number of resources
-    pass
+def port_trate_4_to_1(
+    G: T.Board,
+    player: Player,
+    ressource: T.RESSOURCE,
+    output: T.RESSOURCE,
+    raise_on_error: bool = False,
+) -> bool:
+    if not check_port_trate_4_to_1(G, player, ressource, raise_on_error=raise_on_error):
+        return False
+
+    for _ in range(4):
+        remove_ressource_from_player(G, player, ressource)
+
+    add_ressource_to_player(G, player, output)
+    return True
+
+
+def check_port_trate_4_to_1(
+    G: T.Board, player: Player, ressource: T.RESSOURCE, raise_on_error=False
+) -> bool:
+    if get_ressources_of_player_dict(G, player)[ressource] >= 4:
+        return True
+
+    if raise_on_error:
+        raise ValueError("No enough ressource for 4:1 trate")
+    return False
 
 
 def post_trate_3_to_1():

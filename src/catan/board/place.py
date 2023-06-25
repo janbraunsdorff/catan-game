@@ -88,6 +88,7 @@ def check_building(
 def add_connection(
     G: T.Board, player: Player, node_u: int, node_v: int, building: T.CONNECTION
 ) -> None:
+    # TODO check numer of streets alreay placed
     # check if edge and empty road
     edge = G.edges[node_u, node_v]
     if edge["type"] != T.EDGE_TYPE.STREET:
@@ -119,7 +120,7 @@ def add_connection(
         raise PlaceNotAllowed("No Street or Building is connected")
 
     G.edges[node_u, node_v]["owner"] = player.color
-    G.edges[node_u, node_v]["street_type"] = T.CONNECTION.Road
+    G.edges[node_u, node_v]["street_type"] = building
 
     remove_ressource_from_player(G, player, T.RESSOURCE.Brick)
     remove_ressource_from_player(G, player, T.RESSOURCE.Lumber)
