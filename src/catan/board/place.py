@@ -23,14 +23,15 @@ def add_building(
     index: int,
     building: T.BUILDING,
     founding: bool = False,
-    raise_on_error: bool = True,
 ) -> None:
-    try:
-        check_building(G, player, index, building, founding)
-    except PlaceNotAllowed as e:
-        if raise_on_error:
-            raise e
-        return
+    check_building(
+        G=G,
+        player=player,
+        index=index,
+        building=building,
+        founding=founding,
+        raise_on_error=True,
+    )
 
     G.nodes[index]["bulding_type"] = building
 
@@ -52,29 +53,44 @@ def add_building(
 
 
 def check_building(
-    G: T.Board, player: Player, index: int, building: T.BUILDING, founding: bool
-):
-    _pass_or_raise_number_of_buildings(G=G, player=player, building=building)
-    _pass_or_raise_node_type_to_place(G=G, index=index)
+    G: T.Board,
+    player: Player,
+    index: int,
+    building: T.BUILDING,
+    founding: bool,
+    raise_on_error: bool,
+) -> bool:
+    try:
+        _pass_or_raise_number_of_buildings(G=G, player=player, building=building)
+        _pass_or_raise_node_type_to_place(G=G, index=index)
 
-    if building == T.BUILDING.SETTELMENT:
-        _pass_or_raise_can_place_settelment(G=G, index=index)
-        _pass_or_raise_has_enough_ressources_for_settelment(
-            G=G, player=player, founding=founding
-        )
-        _pass_or_raise_buldings_are_to_close(G=G, index=index)
-        _pass_or_raise_building_not_connected_to_street(
-            G=G, player=player, index=index, founding=founding
-        )
+        if building == T.BUILDING.SETTELMENT:
+            _pass_or_raise_can_place_settelment(G=G, index=index)
+            _pass_or_raise_has_enough_ressources_for_settelment(
+                G=G, player=player, founding=founding
+            )
+            _pass_or_raise_buldings_are_to_close(G=G, index=index)
+            _pass_or_raise_building_not_connected_to_street(
+                G=G, player=player, index=index, founding=founding
+            )
 
-    if building == T.BUILDING.CITY:
-        _pass_or_raise_can_place_city(G=G, player=player, index=index)
-        _pass_or_raise_has_enough_ressources_for_city(G=G, player=player)
+        if building == T.BUILDING.CITY:
+            _pass_or_raise_can_place_city(G=G, player=player, index=index)
+            _pass_or_raise_has_enough_ressources_for_city(G=G, player=player)
+    except PlaceNotAllowed as e:
+        if raise_on_error:
+            raise e
+        return False
+
+    return True
 
 
 def add_connection(
     G: T.Board, player: Player, index: int, building: T.CONNECTION
 ) -> None:
+    # check if edge and empty road
+    # check for ressources
+    # update edge
     raise NotImplementedError()
 
 

@@ -5,7 +5,12 @@ import pytest
 
 import catan.board.types as T
 from catan.board.graph import BoardBuilder
-from catan.board.place import PlaceNotAllowed, add_building, get_buildings_of_player
+from catan.board.place import (
+    PlaceNotAllowed,
+    add_building,
+    check_building,
+    get_buildings_of_player,
+)
 from catan.board.ressources import get_ressources_of_player_list
 from catan.player import Player
 
@@ -430,21 +435,48 @@ def test_founding_without_ressources_and_streets():
     )
 
 
-def test_raise_on_error():
+def test_retun_False_on_error():
     player = TestPlayer(T.COLOR.BLUE)
 
     G = BoardBuilder().create_board_of_size([1]).with_player(player=player).build()
 
-    num_nodes = len(G.nodes())
-    num_edges = len(G.edges())
-
-    add_building(
+    res = check_building(
         G=G,
         player=player,
         index=101,
         building=T.BUILDING.SETTELMENT,
+        founding=False,
         raise_on_error=False,
     )
 
-    assert len(G.nodes()) == num_nodes
-    assert len(G.edges()) == num_edges
+    assert res == False
+
+
+def test_retun_True_on_error():
+    player = TestPlayer(T.COLOR.BLUE)
+
+    G = BoardBuilder().create_board_of_size([1]).with_player(player=player).build()
+
+    for r in [
+        T.RESSOURCE.Brick,
+        T.RESSOURCE.Wool,
+        T.RESSOURCE.Grain,
+        T.RESSOURCE.Lumber,
+    ]:
+        ressource_id = str(uuid4())
+        G.add_node(ressource_id, type=T.NODE_TYPE.RESSOURCE, ressource=r)
+        G.add_edge(player.color, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP)
+
+    G.edges[100, 101]["street_type"] = T.CONNECTION.Road
+    G.edges[100, 101]["owner"] = player.color
+
+    res = check_building(
+        G=G,
+        player=player,
+        index=101,
+        building=T.BUILDING.SETTELMENT,
+        founding=False,
+        raise_on_error=False,
+    )
+
+    assert res == True
