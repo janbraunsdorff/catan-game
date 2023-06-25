@@ -82,7 +82,7 @@ def port_trate_4_to_1(
     output: T.RESSOURCE,
     raise_on_error: bool = False,
 ) -> bool:
-    if not check_port_trate_4_to_1(G, player, ressource, raise_on_error=raise_on_error):
+    if not check_ressources(G, player, ressource, 4, raise_on_error=raise_on_error):
         return False
 
     for _ in range(4):
@@ -92,21 +92,72 @@ def port_trate_4_to_1(
     return True
 
 
-def check_port_trate_4_to_1(
-    G: T.Board, player: Player, ressource: T.RESSOURCE, raise_on_error=False
+def check_ressources(
+    G: T.Board,
+    player: Player,
+    ressource: T.RESSOURCE,
+    number: int,
+    raise_on_error=False,
 ) -> bool:
-    if get_ressources_of_player_dict(G, player)[ressource] >= 4:
+    if get_ressources_of_player_dict(G, player)[ressource] >= number:
         return True
 
     if raise_on_error:
-        raise ValueError("No enough ressource for 4:1 trate")
+        raise ValueError(f"No enough ressource for {number}:1 trate")
     return False
 
 
-def post_trate_3_to_1():
-    # check for port
-    # check of number of resources
-    pass
+def player_has_port(G: T.Board, player: Player, port: T.PORT):
+    ports = [
+        x
+        for x, y in G.nodes(data=True)
+        if y["type"] == T.NODE_TYPE.PORT and y["port_type"] == port
+    ]
+
+    for port in ports:
+        for node_a, node_b in [
+            (u, v)
+            for u, v, x in G.edges(port, data=True)
+            if x["type"] == T.EDGE_TYPE.PORT_TO
+        ]:
+            if (
+                G.nodes[node_a]["type"] == T.NODE_TYPE.BUILDING
+                and G.nodes[node_a]["bulding_type"] != T.BUILDING.MISSING
+                and G.has_edge(node_a, player.color)
+            ):
+                return True
+
+            if (
+                G.nodes[node_b]["type"] == T.NODE_TYPE.BUILDING
+                and G.nodes[node_b]["bulding_type"] != T.BUILDING.MISSING
+                and G.has_edge(node_b, player.color)
+            ):
+                return True
+    return False
+
+
+def post_trate_3_to_1(
+    G: T.Board,
+    player: Player,
+    ressource: T.RESSOURCE,
+    output: T.RESSOURCE,
+    raise_on_error: bool = False,
+):
+    if not player_has_port(G, player, T.PORT.Any):
+        if raise_on_error:
+            raise ValueError("Player has no 3:1 claimed")
+        else:
+            return False
+
+    if not check_ressources(G, player, ressource, 3, raise_on_error=raise_on_error):
+        return False
+
+    for _ in range(3):
+        remove_ressource_from_player(G, player, ressource)
+
+    add_ressource_to_player(G, player, output)
+
+    return True
 
 
 def port_trate_2_to_1():
