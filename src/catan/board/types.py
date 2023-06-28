@@ -74,6 +74,8 @@ class NODE_TYPE(Enum):
     BUILDING = "building"
     RESSOURCE = "resource"
     PORT = "port"
+    DEVELOPEMENT = "development"
+    ROBBER = "robber"
 
 
 class PORT_TYPE(Enum):
@@ -83,3 +85,11 @@ class PORT_TYPE(Enum):
     PORT_GRAIN = "port_grain"
     PORT_ORE = "port_ore"
     PORT_BRICK = "port_brick"
+
+
+class DEVELOPMENT_CARDS(Enum):
+    KNIGHT = "knight"
+    MONOPOL = "monopol"
+    STREET_BUILDING = "street_building"
+    INVENTION = "invention"
+    VICTORY_POINTS = "victory_points"

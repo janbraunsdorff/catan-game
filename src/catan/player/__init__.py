@@ -1,7 +1,9 @@
 from abc import ABC
+from typing import List
 
 import catan.board.types as T
 from catan.board.place import add_building, add_connection
+from catan.board.ressources import get_ressources_of_player_list, player_has_port
 
 
 class Player(ABC):
@@ -12,6 +14,16 @@ class Player(ABC):
     @property
     def color(self) -> str:
         return self._color.value
+
+    def get_ports(self, G: T.Board) -> List[T.PORT]:
+        ports = []
+        for p in T.PORT:
+            if player_has_port(G, self, p):
+                ports.append(p)
+        return ports
+
+    def get_ressources(self, G: T.Board) -> List[T.RESSOURCE]:
+        return get_ressources_of_player_list(G, self)
 
     def place_settelment(self, G: T.Board, index: int):
         add_building(G, self, index, T.BUILDING.SETTELMENT)

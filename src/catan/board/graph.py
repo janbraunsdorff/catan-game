@@ -27,6 +27,7 @@ from uuid import uuid4
 import networkx as nx
 
 from catan.board import types as T
+from catan.board.developments import add_development_cards
 
 
 class BoardBuilder:
@@ -46,6 +47,8 @@ class BoardBuilder:
         return self
 
     def build(self) -> T.Board:
+        self.board = add_development_cards(self.board)
+        self.board = add_robber(self.board)
         return self.board
 
 
@@ -254,3 +257,8 @@ def create_empty_streets(
                 coor=[x, y],
                 owner=None,
             )
+
+
+def add_robber(G: T.Board) -> T.Board:
+    G.add_node("robber", type=T.NODE_TYPE.ROBBER, robber_type=T.ROBBER.Normal)
+    return G
