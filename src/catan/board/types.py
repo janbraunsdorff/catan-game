@@ -4,6 +4,10 @@ from typing import Dict, List, Tuple
 from networkx import Graph
 
 
+class EXTENTIONS(Enum):
+    SEE = "see"
+
+
 class TILE_TYPE(Enum):
     Missing = 0
     Mountains = 1
@@ -24,6 +28,7 @@ class PORT(Enum):
 
 
 class RESSOURCE(Enum):
+    No = 1
     Grain = 2
     Ore = 3
     Wool = 4

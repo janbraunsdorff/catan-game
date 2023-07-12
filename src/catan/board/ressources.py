@@ -25,6 +25,17 @@ def add_ressource_to_player(
     return G
 
 
+def add_ressource_to_player_id(
+    G: T.Board, player_idx: str, ressource: T.RESSOURCE
+) -> T.Board:
+    ressource_id = str(uuid4())
+
+    G.add_node(ressource_id, type=T.NODE_TYPE.RESSOURCE, ressource=ressource)
+    G.add_edge(player_idx, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP)
+
+    return G
+
+
 def add_ressources_to_player(
     G: T.Board, player, ressources: List[T.RESSOURCE]
 ) -> T.Board:
@@ -234,3 +245,52 @@ def player_trate(
         add_ressource_to_player(G, player_a, ressource)
 
     return True
+
+
+def add_ressource_after_dice_roll(G: T.Board, dice_value: int):
+    thrown_fileds = [
+        x
+        for x, y in G.nodes(data=True)
+        if y["type"] == T.NODE_TYPE.TILE and y["dice_value"] == dice_value
+    ]
+
+    for field in thrown_fileds:
+        ressource_type = G.nodes[field]["node_type"]
+
+        get_ressources = [
+            max(t, n)
+            for t, n, y in G.edges(field, data=True)
+            if y["type"] == T.EDGE_TYPE.PRODUCE_TO
+        ]
+
+        players = []
+        for r in get_ressources:
+            if G.nodes[r]["bulding_type"] == T.BUILDING.SETTELMENT:
+                ownership = [
+                    n
+                    for r, n, y in G.edges(r, data=True)
+                    if y["type"] == T.EDGE_TYPE.SETTELMENT_OWNERSHIP
+                ][0]
+                players.append(ownership)
+
+            if G.nodes[r]["bulding_type"] == T.BUILDING.CITY:
+                ownership = [
+                    n
+                    for r, n, y in G.edges(r, data=True)
+                    if y["type"] == T.EDGE_TYPE.CITY_ONWERSHIP
+                ][0]
+                players.append(ownership)
+                players.append(ownership)
+
+        for player in players:
+            add_ressource_to_player_id(G, player, field_to_ressource[ressource_type])
+
+
+field_to_ressource: Dict[T.TILE_TYPE, T.RESSOURCE] = {
+    T.TILE_TYPE.Desert: T.RESSOURCE.No,
+    T.TILE_TYPE.Fields: T.RESSOURCE.Grain,
+    T.TILE_TYPE.Forest: T.RESSOURCE.Lumber,
+    T.TILE_TYPE.Hills: T.RESSOURCE.Brick,
+    T.TILE_TYPE.Mountains: T.RESSOURCE.Ore,
+    T.TILE_TYPE.Pasture: T.RESSOURCE.Wool,
+}
