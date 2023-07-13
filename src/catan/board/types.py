@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, List, Tuple
+from typing import Tuple
 
 from networkx import Graph
 

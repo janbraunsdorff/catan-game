@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Dict, List, Tuple
 if TYPE_CHECKING:
     from catan.player import Player  # pragma: no cover
 
-from catan.board import types as T
+import catan.board.types as T
 from catan.board.ressources import (
     get_ressources_of_player_dict,
     remove_ressource_from_player,

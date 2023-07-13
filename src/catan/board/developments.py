@@ -1,55 +1,39 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from catan.player import Player  # pragma: no cover
 
-
-from uuid import uuid4
-
-import catan.board.types as T  # pragma: no cover
+import catan.board.types as T
+from catan.board.ressources import get_ressources_of_player_dict
 
 
-def add_development_cards(G: T.Board) -> T.Board:
-    for _ in range(14):
-        G.add_node(
-            str(uuid4()),
-            type=T.NODE_TYPE.DEVELOPEMENT,
-            development_type=T.DEVELOPMENT_CARDS.KNIGHT,
-        )
+def check_ressources_for_development(G: T.Board, player: Player, raise_on_error=False):
+    ressource = get_ressources_of_player_dict(G, player)
+    error = ""
+    if ressource.get(T.RESSOURCE.Wool, 0) < 1:
+        error = "Not enough resources available"
 
-    for _ in range(5):
-        G.add_node(
-            str(uuid4()),
-            type=T.NODE_TYPE.DEVELOPEMENT,
-            development_type=T.DEVELOPMENT_CARDS.VICTORY_POINTS,
-        )
+    if ressource.get(T.RESSOURCE.Ore, 0) < 1:
+        error = "Not enough resources available"
 
-    for _ in range(2):
-        G.add_node(
-            str(uuid4()),
-            type=T.NODE_TYPE.DEVELOPEMENT,
-            development_type=T.DEVELOPMENT_CARDS.STREET_BUILDING,
-        )
-    for _ in range(2):
-        G.add_node(
-            str(uuid4()),
-            type=T.NODE_TYPE.DEVELOPEMENT,
-            development_type=T.DEVELOPMENT_CARDS.INVENTION,
-        )
-    for _ in range(2):
-        G.add_node(
-            str(uuid4()),
-            type=T.NODE_TYPE.DEVELOPEMENT,
-            development_type=T.DEVELOPMENT_CARDS.MONOPOL,
-        )
+    if ressource.get(T.RESSOURCE.Grain, 0) < 1:
+        error = "Not enough resources available"
 
-    return G
+    if len(error) == 0:
+        return True
+
+    if raise_on_error:
+        raise ValueError(error)
+
+    return False
 
 
-def trade_developement(G: T.Board, player: Player, card: T.DEVELOPMENT_CARDS):
-    # check ressources
+def trade_developement(
+    G: T.Board, player: Player, card: Optional[T.DEVELOPMENT_CARDS] = None
+):
+    check_ressources_for_development(G, player, True)
+    # #check if card is avible
     # if card  = None -> random
     # else check if card is aviable -> add
-    pass
