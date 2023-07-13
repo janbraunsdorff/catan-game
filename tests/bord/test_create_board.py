@@ -8,15 +8,8 @@ from catan.board.graph import BoardBuilder
 from catan.player import Player
 
 
-class TestPlayer(Player):
-    def __init__(self, color: T.COLOR) -> None:
-        super().__init__(color)
-
-
-def test_add_robber():
-    player = TestPlayer(T.COLOR.BLUE)
-
-    G = BoardBuilder().create_board_of_size([1]).with_player(player).build()
+def test_add_robber(player_blue):
+    G = BoardBuilder().create_board_of_size([1]).with_player(player_blue).build()
 
     assert G.nodes["robber"]["type"] == T.NODE_TYPE.ROBBER
     assert G.nodes["robber"]["robber_type"] == T.ROBBER.Normal

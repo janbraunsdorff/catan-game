@@ -12,6 +12,15 @@ from uuid import uuid4
 import catan.board.types as T
 from catan.board.graph import get_player_node_by_color
 
+field_to_ressource: Dict[T.TILE_TYPE, T.RESSOURCE] = {
+    T.TILE_TYPE.Desert: T.RESSOURCE.No,
+    T.TILE_TYPE.Fields: T.RESSOURCE.Grain,
+    T.TILE_TYPE.Forest: T.RESSOURCE.Lumber,
+    T.TILE_TYPE.Hills: T.RESSOURCE.Brick,
+    T.TILE_TYPE.Mountains: T.RESSOURCE.Ore,
+    T.TILE_TYPE.Pasture: T.RESSOURCE.Wool,
+}
+
 
 def add_ressource_to_player(
     G: T.Board, player: Player, ressource: T.RESSOURCE
@@ -284,13 +293,3 @@ def add_ressource_after_dice_roll(G: T.Board, dice_value: int):
 
         for player in players:
             add_ressource_to_player_id(G, player, field_to_ressource[ressource_type])
-
-
-field_to_ressource: Dict[T.TILE_TYPE, T.RESSOURCE] = {
-    T.TILE_TYPE.Desert: T.RESSOURCE.No,
-    T.TILE_TYPE.Fields: T.RESSOURCE.Grain,
-    T.TILE_TYPE.Forest: T.RESSOURCE.Lumber,
-    T.TILE_TYPE.Hills: T.RESSOURCE.Brick,
-    T.TILE_TYPE.Mountains: T.RESSOURCE.Ore,
-    T.TILE_TYPE.Pasture: T.RESSOURCE.Wool,
-}

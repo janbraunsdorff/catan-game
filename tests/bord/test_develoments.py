@@ -8,11 +8,6 @@ from catan.board.graph import BoardBuilder
 from catan.player import Player
 
 
-class TestPlayer(Player):
-    def __init__(self, color: T.COLOR) -> None:
-        super().__init__(color)
-
-
 @pytest.mark.parametrize(
     "t,length",
     [
@@ -23,10 +18,8 @@ class TestPlayer(Player):
         (T.DEVELOPMENT_CARDS.VICTORY_POINTS, 5),
     ],
 )
-def test_add_developent(t, length):
-    player = TestPlayer(T.COLOR.BLUE)
-
-    G = BoardBuilder().create_board_of_size([1]).with_player(player).build()
+def test_add_developent(player_blue, t, length):
+    G = BoardBuilder().create_board_of_size([1]).with_player(player_blue).build()
 
     assert (
         len(

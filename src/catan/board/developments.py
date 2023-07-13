@@ -1,3 +1,11 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from catan.player import Player  # pragma: no cover
+
+
 from uuid import uuid4
 
 import catan.board.types as T  # pragma: no cover
@@ -38,3 +46,10 @@ def add_development_cards(G: T.Board) -> T.Board:
         )
 
     return G
+
+
+def trade_developement(G: T.Board, player: Player, card: T.DEVELOPMENT_CARDS):
+    # check ressources
+    # if card  = None -> random
+    # else check if card is aviable -> add
+    pass
