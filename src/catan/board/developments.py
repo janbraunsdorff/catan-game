@@ -127,3 +127,6 @@ def get_knights_of_player(G: T.Board, player: Union[Player, str]) -> int:
             counter += 1
 
     return counter
+
+
+# TODO: use development cards

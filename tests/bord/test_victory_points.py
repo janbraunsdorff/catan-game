@@ -6,6 +6,7 @@ from catan.board.graph import BoardBuilder
 from catan.board.place import add_building
 from catan.board.victory_points import (
     count_city_points,
+    count_development_cards,
     count_settelment_points,
     highest_knights,
 )
@@ -194,3 +195,79 @@ def test_four_knights_other_threee(remove, check, check1, player_blue, player_re
     trade_developement(board, player_red, T.DEVELOPMENT_CARDS.KNIGHT)
 
     assert highest_knights(board, player_blue) == 2
+
+
+@patch("catan.board.developments.remove_ressource_from_player")
+@patch("catan.board.developments.check_ressources_for_development")
+@patch("catan.board.developments.check_cards")
+def test_on_victory_development(remove, check, check1, player_blue, player_red):
+    board = (
+        BoardBuilder()
+        .create_board_of_size([1, 2, 1])
+        .with_player(player_blue)
+        .with_player(player_red)
+        .build()
+    )
+    remove.return_value = True
+
+    assert count_development_cards(board, player_blue) == 0
+
+
+@patch("catan.board.developments.remove_ressource_from_player")
+@patch("catan.board.developments.check_ressources_for_development")
+@patch("catan.board.developments.check_cards")
+def test_one_victory_development(remove, check, check1, player_blue, player_red):
+    board = (
+        BoardBuilder()
+        .create_board_of_size([1, 2, 1])
+        .with_player(player_blue)
+        .with_player(player_red)
+        .build()
+    )
+    remove.return_value = True
+
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.VICTORY_POINTS)
+
+    assert count_development_cards(board, player_blue) == 1
+
+
+@patch("catan.board.developments.remove_ressource_from_player")
+@patch("catan.board.developments.check_ressources_for_development")
+@patch("catan.board.developments.check_cards")
+def test_two_victory_development(remove, check, check1, player_blue, player_red):
+    board = (
+        BoardBuilder()
+        .create_board_of_size([1, 2, 1])
+        .with_player(player_blue)
+        .with_player(player_red)
+        .build()
+    )
+    remove.return_value = True
+
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.VICTORY_POINTS)
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.VICTORY_POINTS)
+
+    assert count_development_cards(board, player_blue) == 2
+
+
+@patch("catan.board.developments.remove_ressource_from_player")
+@patch("catan.board.developments.check_ressources_for_development")
+@patch("catan.board.developments.check_cards")
+def test_two_victory_development_one_other(
+    remove, check, check1, player_blue, player_red
+):
+    board = (
+        BoardBuilder()
+        .create_board_of_size([1, 2, 1])
+        .with_player(player_blue)
+        .with_player(player_red)
+        .build()
+    )
+    remove.return_value = True
+
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.VICTORY_POINTS)
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.VICTORY_POINTS)
+
+    trade_developement(board, player_red, T.DEVELOPMENT_CARDS.VICTORY_POINTS)
+
+    assert count_development_cards(board, player_blue) == 2

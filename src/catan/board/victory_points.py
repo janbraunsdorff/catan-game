@@ -1,4 +1,3 @@
-# developent cards
 # longest streets -> https://stackoverflow.com/questions/64737143/is-there-a-networkx-algorithm-to-find-the-longest-path-from-a-source-to-a-target b
 from __future__ import annotations
 
@@ -38,3 +37,22 @@ def highest_knights(G: T.Board, player: Player) -> int:
     knights = get_knights_of_player(G, player)
 
     return 2 if knights >= 3 and knights > max(players_knights) else 0
+
+
+def count_development_cards(G: T.Board, player: Player) -> int:
+    development_cards = [
+        v
+        for u, v, data in G.edges(data=True)
+        if data["type"] == T.EDGE_TYPE.DEVELOPMENT_OWNERSHIP
+        and data["owner"] == player.color
+    ]
+
+    counter = 0
+    for development_card in development_cards:
+        if (
+            G.nodes[development_card]["development_type"]
+            == T.DEVELOPMENT_CARDS.VICTORY_POINTS
+        ):
+            counter += 1
+
+    return counter
