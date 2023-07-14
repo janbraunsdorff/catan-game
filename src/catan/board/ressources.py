@@ -29,7 +29,7 @@ def add_ressource_to_player(
     ressource_id = str(uuid4())
 
     G.add_node(ressource_id, type=T.NODE_TYPE.RESSOURCE, ressource=ressource)
-    G.add_edge(idx, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP)
+    G.add_edge(idx, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP, owner=idx)
 
     return G
 
@@ -40,7 +40,9 @@ def add_ressource_to_player_id(
     ressource_id = str(uuid4())
 
     G.add_node(ressource_id, type=T.NODE_TYPE.RESSOURCE, ressource=ressource)
-    G.add_edge(player_idx, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP)
+    G.add_edge(
+        player_idx, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP, owner=player_idx
+    )
 
     return G
 
