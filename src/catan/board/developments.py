@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, Optional
+from typing import TYPE_CHECKING, Dict, Optional, Union
 
 if TYPE_CHECKING:
     from catan.player import Player  # pragma: no cover
@@ -109,3 +109,21 @@ def trade_developement(
     remove_ressource_from_player(G, player, T.RESSOURCE.Wool)
     remove_ressource_from_player(G, player, T.RESSOURCE.Grain)
     remove_ressource_from_player(G, player, T.RESSOURCE.Ore)
+
+
+def get_knights_of_player(G: T.Board, player: Union[Player, str]) -> int:
+    if not isinstance(player, str):
+        player = player.color
+
+    development_cards = [
+        v
+        for u, v, data in G.edges(data=True)
+        if data["type"] == T.EDGE_TYPE.DEVELOPMENT_OWNERSHIP and data["owner"] == player
+    ]
+
+    counter = 0
+    for development_card in development_cards:
+        if G.nodes[development_card]["development_type"] == T.DEVELOPMENT_CARDS.KNIGHT:
+            counter += 1
+
+    return counter

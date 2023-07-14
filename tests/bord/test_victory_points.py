@@ -1,9 +1,14 @@
 from unittest.mock import patch
 
 import catan.board.types as T
+from catan.board.developments import trade_developement
 from catan.board.graph import BoardBuilder
 from catan.board.place import add_building
-from catan.board.victory_points import count_city_points, count_settelment_points
+from catan.board.victory_points import (
+    count_city_points,
+    count_settelment_points,
+    highest_knights,
+)
 
 
 def test_count_settelement_1(player_blue):
@@ -58,3 +63,134 @@ def test_count_city_2(remoce, place, player_blue):
     add_building(board, player_blue, 108, T.BUILDING.CITY)
 
     assert count_city_points(board, player_blue) == 4
+
+
+def test_no_knights(player_blue):
+    board = (
+        BoardBuilder().create_board_of_size([1, 2, 1]).with_player(player_blue).build()
+    )
+
+    assert highest_knights(board, player_blue) == 0
+
+
+@patch("catan.board.developments.check_cards")
+@patch("catan.board.developments.check_ressources_for_development")
+@patch("catan.board.developments.remove_ressource_from_player")
+def test_one_knights(check_cards, check_ressource, remove, player_blue):
+    board = (
+        BoardBuilder().create_board_of_size([1, 2, 1]).with_player(player_blue).build()
+    )
+
+    remove = lambda x: True
+
+    remove.return_value = True
+
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.KNIGHT)
+
+    assert highest_knights(board, player_blue) == 0
+
+
+@patch("catan.board.developments.remove_ressource_from_player")
+@patch("catan.board.developments.check_ressources_for_development")
+@patch("catan.board.developments.check_cards")
+def test_two_knights(remove, check, check1, player_blue):
+    board = (
+        BoardBuilder().create_board_of_size([1, 2, 1]).with_player(player_blue).build()
+    )
+
+    remove.return_value = True
+
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.KNIGHT)
+
+    assert highest_knights(board, player_blue) == 0
+
+
+@patch("catan.board.developments.remove_ressource_from_player")
+@patch("catan.board.developments.check_ressources_for_development")
+@patch("catan.board.developments.check_cards")
+def test_three_knights(remove, check, check1, player_blue):
+    board = (
+        BoardBuilder().create_board_of_size([1, 2, 1]).with_player(player_blue).build()
+    )
+    remove.return_value = True
+
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.KNIGHT)
+
+    assert highest_knights(board, player_blue) == 2
+
+
+@patch("catan.board.developments.remove_ressource_from_player")
+@patch("catan.board.developments.check_ressources_for_development")
+@patch("catan.board.developments.check_cards")
+def test_three_knights_other_too(remove, check, check1, player_blue, player_red):
+    board = (
+        BoardBuilder()
+        .create_board_of_size([1, 2, 1])
+        .with_player(player_blue)
+        .with_player(player_red)
+        .build()
+    )
+    remove.return_value = True
+
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.KNIGHT)
+
+    trade_developement(board, player_red, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_red, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_red, T.DEVELOPMENT_CARDS.KNIGHT)
+
+    assert highest_knights(board, player_blue) == 0
+
+
+@patch("catan.board.developments.remove_ressource_from_player")
+@patch("catan.board.developments.check_ressources_for_development")
+@patch("catan.board.developments.check_cards")
+def test_three_knights_other_more(remove, check, check1, player_blue, player_red):
+    board = (
+        BoardBuilder()
+        .create_board_of_size([1, 2, 1])
+        .with_player(player_blue)
+        .with_player(player_red)
+        .build()
+    )
+    remove.return_value = True
+
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.KNIGHT)
+
+    trade_developement(board, player_red, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_red, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_red, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_red, T.DEVELOPMENT_CARDS.KNIGHT)
+
+    assert highest_knights(board, player_blue) == 0
+
+
+@patch("catan.board.developments.remove_ressource_from_player")
+@patch("catan.board.developments.check_ressources_for_development")
+@patch("catan.board.developments.check_cards")
+def test_four_knights_other_threee(remove, check, check1, player_blue, player_red):
+    board = (
+        BoardBuilder()
+        .create_board_of_size([1, 2, 1])
+        .with_player(player_blue)
+        .with_player(player_red)
+        .build()
+    )
+    remove.return_value = True
+
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_blue, T.DEVELOPMENT_CARDS.KNIGHT)
+
+    trade_developement(board, player_red, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_red, T.DEVELOPMENT_CARDS.KNIGHT)
+    trade_developement(board, player_red, T.DEVELOPMENT_CARDS.KNIGHT)
+
+    assert highest_knights(board, player_blue) == 2
