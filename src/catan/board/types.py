@@ -71,6 +71,7 @@ class EDGE_TYPE(Enum):
     RESSOURCE_OWNERSHIP = "resource_ownership"
     SETTELMENT_OWNERSHIP = "settelment_ownership"
     CITY_ONWERSHIP = "city_ownership"
+    DEVELOPMENT_OWNERSHIP = "developer_ownership"
 
 
 class NODE_TYPE(Enum):
