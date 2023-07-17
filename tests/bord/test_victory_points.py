@@ -1,11 +1,14 @@
 from unittest.mock import patch
 
+import networkx as nx
+
 import catan.board.types as T
 from catan.board.developments import trade_developement
 from catan.board.graph import BoardBuilder
 from catan.board.place import add_building
 from catan.board.victory_points import (
     count_city_points,
+    count_connected_nodes,
     count_development_cards,
     count_settelment_points,
     highest_knights,
@@ -271,3 +274,120 @@ def test_two_victory_development_one_other(
     trade_developement(board, player_red, T.DEVELOPMENT_CARDS.VICTORY_POINTS)
 
     assert count_development_cards(board, player_blue) == 2
+
+
+def test_connected_streets_one():
+    G = nx.Graph()
+    G.add_edge(1, 2)
+
+    assert count_connected_nodes(G) == 1
+
+
+def test_connected_streets_zero():
+    G = nx.Graph()
+
+    assert count_connected_nodes(G) == 0
+
+
+def test_connected_streets_three():
+    G = nx.Graph()
+
+    G.add_edge(1, 2)
+    G.add_edge(2, 3)
+    G.add_edge(3, 4)
+
+    assert count_connected_nodes(G) == 3
+
+
+def test_connected_streets_foure_dist():
+    G = nx.Graph()
+
+    G.add_edge(1, 2)
+    G.add_edge(1, 6)
+
+    G.add_edge(2, 3)
+    G.add_edge(3, 4)
+    G.add_edge(4, 5)
+
+    assert count_connected_nodes(G) == 5
+
+
+def test_connected_streets_foure_short_cut():
+    G = nx.Graph()
+
+    G.add_edge(1, 2)
+    G.add_edge(1, 4)
+
+    G.add_edge(2, 3)
+    G.add_edge(3, 4)
+    G.add_edge(4, 5)
+    G.add_edge(1, 6)
+
+    assert count_connected_nodes(G) == 5
+
+
+def test_connected_streets_foure_cicle():
+    G = nx.Graph()
+
+    G.add_edge(1, 2)
+    G.add_edge(2, 3)
+    G.add_edge(3, 4)
+    G.add_edge(4, 5)
+    G.add_edge(5, 6)
+    G.add_edge(6, 1)
+
+    assert count_connected_nodes(G) == 6
+
+
+def test_connected_streets_foure_advanced():
+    G = nx.Graph()
+
+    G.add_edge(1, 3)
+    G.add_edge(3, 5)
+    G.add_edge(4, 6)
+    G.add_edge(4, 7)
+    G.add_edge(5, 8)
+    G.add_edge(5, 7)
+    G.add_edge(6, 9)
+    G.add_edge(7, 10)
+    G.add_edge(8, 11)
+    G.add_edge(9, 12)
+    G.add_edge(10, 12)
+    G.add_edge(10, 13)
+    G.add_edge(13, 11)
+
+    assert count_connected_nodes(G) == 12
+
+
+def test_connected_two_circulars():
+    G = nx.Graph()
+
+    G.add_edge(1, 2)
+    G.add_edge(2, 3)
+    G.add_edge(3, 4)
+    G.add_edge(4, 5)
+    G.add_edge(5, 6)
+    G.add_edge(6, 3)
+    G.add_edge(7, 3)
+    G.add_edge(7, 1)
+
+    assert count_connected_nodes(G) == 8
+
+
+def test_connected_two_circulars_arms():
+    G = nx.Graph()
+
+    G.add_edge(1, 2)
+    G.add_edge(2, 3)
+    G.add_edge(3, 4)
+    G.add_edge(4, 5)
+    G.add_edge(5, 6)
+    G.add_edge(6, 3)
+    G.add_edge(7, 3)
+    G.add_edge(7, 1)
+
+    G.add_edge(2, 9)
+    G.add_edge(10, 5)
+    G.add_edge(10, 11)
+
+    assert count_connected_nodes(G) == 10

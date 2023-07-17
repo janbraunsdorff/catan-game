@@ -1,10 +1,14 @@
 # longest streets -> https://stackoverflow.com/questions/64737143/is-there-a-networkx-algorithm-to-find-the-longest-path-from-a-source-to-a-target b
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, List, Tuple
+from typing import TYPE_CHECKING, List, Self, Set, Tuple
 
 if TYPE_CHECKING:
-    from catan.player import Player
+    from catan.player import Player  # pragma: no cover
+
+from itertools import permutations
+
+import networkx as nx
 
 import catan.board.types as T
 from catan.board.developments import get_knights_of_player
@@ -56,3 +60,70 @@ def count_development_cards(G: T.Board, player: Player) -> int:
             counter += 1
 
     return counter
+
+
+# TODO: count
+
+
+class Node:
+    def __init__(self, value: int, length: int, leafes: List[Self]) -> None:
+        self.value = value
+        self.length = length
+        self.leafes = leafes
+
+    def get_longest_path(self) -> int:
+        if len(self.leafes) == 0:
+            return self.length
+        return max([x.get_longest_path() for x in self.leafes])
+
+
+def get_conected_nodes_to(
+    edges: List[Tuple[int, int]], node: int
+) -> Set[Tuple[int, int]]:
+    possible_edges = filter(
+        lambda x: x[0] == node or x[1] == node,
+        edges,
+    )
+    possible_edges_set = set(possible_edges)
+    return possible_edges_set
+
+
+def get_conected_nodes_recursive(
+    edges: List[Tuple[int, int]],
+    start_node: int,
+    depth: int,
+    history: Set[Tuple[int, int]],
+) -> Node:
+    surrounding_nodes = get_conected_nodes_to(edges, start_node)
+    surrounding_nodes -= history
+
+    leafes = []
+    if len(surrounding_nodes) > 0:
+        for x in surrounding_nodes:
+            further_node = x[0] if x[0] != start_node else x[1]
+            hc = history.copy()
+            hc.add(x)
+            leafe = get_conected_nodes_recursive(
+                edges, further_node, depth=depth + 1, history=hc
+            )
+            leafes.append(leafe)
+
+    return Node(start_node, length=depth, leafes=leafes)
+
+
+def count_connected_nodes(G: T.Board) -> int:
+    edges = G.edges()
+    edges = sorted(edges, key=lambda element: (element[0], element[1]))
+    nodes = [x for x, y in edges]
+    nodes.extend([y for x, y in edges])
+
+    nodes = list(set(nodes))
+
+    longest_depth = 0
+    for start_node in nodes:
+        root = get_conected_nodes_recursive(edges, start_node, 0, set())
+        depth = root.get_longest_path()
+        if depth > longest_depth:
+            longest_depth = depth
+
+    return longest_depth
