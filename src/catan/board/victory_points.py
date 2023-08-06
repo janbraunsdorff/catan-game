@@ -3,16 +3,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List, Self, Set, Tuple
 
-if TYPE_CHECKING:
-    from catan.player import Player  # pragma: no cover
-
-from itertools import permutations
-
 import networkx as nx
 
 import catan.board.types as T
 from catan.board.developments import get_knights_of_player
 from catan.board.place import get_buildings_of_player, get_ownership_of_node
+from catan.player import Player
 
 
 def count_settelment_points(G: T.Board, player: Player) -> int:
@@ -186,3 +182,25 @@ def count_nodes_of_player(G: T.Board, player: Player) -> int:
         )
     )
     return count_connected_nodes(sub_graph, stopnodes=stop_nodes)
+
+
+def get_longest_road_victory_points(G, player: Player) -> int:
+    players = [x for x, y in G.nodes(data=True) if y["type"] == T.NODE_TYPE.PLAYER]
+    player_to_longest_road = [
+        (color, count_nodes_of_player(G, Player(T.COLOR(color)))) for color in players
+    ]
+
+    max_length = max(map(lambda x: x[1], player_to_longest_road))
+
+    if max_length < 5:
+        return 0
+
+    best_player = list(filter(lambda x: x[1] == max_length, player_to_longest_road))
+
+    if len(best_player) > 1:
+        return 0
+
+    if best_player[0][0] == player.color:
+        return 2
+    else:
+        return 0

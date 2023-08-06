@@ -12,6 +12,7 @@ from catan.board.victory_points import (
     count_development_cards,
     count_nodes_of_player,
     count_settelment_points,
+    get_longest_road_victory_points,
     highest_knights,
 )
 
@@ -581,3 +582,121 @@ def test_connected_roads_on_boards_interrupt_by_street(_, __, player_blue, playe
 
     assert count_nodes_of_player(board, player_blue) == 3
     assert count_nodes_of_player(board, player_red) == 4
+
+
+@patch(
+    "catan.board.place.get_ressources_of_player_dict",
+    return_value={
+        T.RESSOURCE.Brick: 100,
+        T.RESSOURCE.Lumber: 100,
+        T.RESSOURCE.Wool: 100,
+        T.RESSOURCE.Grain: 100,
+    },
+)
+@patch("catan.board.place.remove_ressource_from_player")
+def test_longest_road_both_to_short(_, __, player_blue, player_red):
+    board = (
+        BoardBuilder()
+        .create_board_of_size([3, 4, 5, 4, 3])
+        .with_player(player_blue)
+        .with_player(player_red)
+        .build()
+    )
+
+    add_building(board, player_blue, 100, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_blue, 100, 104, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 104, 108, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 108, 112, T.CONNECTION.ROAD)
+
+    add_building(board, player_blue, 129, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_blue, 129, 123, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 123, 117, T.CONNECTION.ROAD)
+
+    add_building(board, player_red, 116, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_red, 116, 122, T.CONNECTION.ROAD)
+    add_connection(board, player_red, 122, 117, T.CONNECTION.ROAD)
+    add_connection(board, player_red, 117, 112, T.CONNECTION.ROAD)
+    add_connection(board, player_red, 116, 111, T.CONNECTION.ROAD)
+
+    assert get_longest_road_victory_points(board, player_blue) == 0
+    assert get_longest_road_victory_points(board, player_red) == 0
+
+
+@patch(
+    "catan.board.place.get_ressources_of_player_dict",
+    return_value={
+        T.RESSOURCE.Brick: 100,
+        T.RESSOURCE.Lumber: 100,
+        T.RESSOURCE.Wool: 100,
+        T.RESSOURCE.Grain: 100,
+    },
+)
+@patch("catan.board.place.remove_ressource_from_player")
+def test_longest_road_for_red_5(_, __, player_blue, player_red):
+    board = (
+        BoardBuilder()
+        .create_board_of_size([3, 4, 5, 4, 3])
+        .with_player(player_blue)
+        .with_player(player_red)
+        .build()
+    )
+
+    add_building(board, player_blue, 100, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_blue, 100, 104, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 104, 108, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 108, 112, T.CONNECTION.ROAD)
+
+    add_building(board, player_blue, 129, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_blue, 129, 123, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 123, 117, T.CONNECTION.ROAD)
+
+    add_building(board, player_red, 116, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_red, 116, 122, T.CONNECTION.ROAD)
+    add_connection(board, player_red, 122, 117, T.CONNECTION.ROAD)
+    add_connection(board, player_red, 117, 112, T.CONNECTION.ROAD)
+    add_connection(board, player_red, 116, 111, T.CONNECTION.ROAD)
+    add_connection(board, player_red, 111, 107, T.CONNECTION.ROAD)
+    add_connection(board, player_red, 107, 103, T.CONNECTION.ROAD)
+
+    assert get_longest_road_victory_points(board, player_blue) == 0
+    assert get_longest_road_victory_points(board, player_red) == 2
+
+
+@patch(
+    "catan.board.place.get_ressources_of_player_dict",
+    return_value={
+        T.RESSOURCE.Brick: 100,
+        T.RESSOURCE.Lumber: 100,
+        T.RESSOURCE.Wool: 100,
+        T.RESSOURCE.Grain: 100,
+    },
+)
+@patch("catan.board.place.remove_ressource_from_player")
+def test_longest_road_for_both_5(_, __, player_blue, player_red):
+    board = (
+        BoardBuilder()
+        .create_board_of_size([3, 4, 5, 4, 3])
+        .with_player(player_blue)
+        .with_player(player_red)
+        .build()
+    )
+
+    add_building(board, player_blue, 100, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_blue, 100, 104, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 104, 108, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 108, 112, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 108, 113, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 113, 109, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 109, 105, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 105, 102, T.CONNECTION.ROAD)
+
+    add_building(board, player_red, 116, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_red, 116, 122, T.CONNECTION.ROAD)
+    add_connection(board, player_red, 122, 117, T.CONNECTION.ROAD)
+    add_connection(board, player_red, 117, 112, T.CONNECTION.ROAD)
+    add_connection(board, player_red, 116, 111, T.CONNECTION.ROAD)
+    add_connection(board, player_red, 111, 107, T.CONNECTION.ROAD)
+    add_connection(board, player_red, 107, 103, T.CONNECTION.ROAD)
+
+    assert get_longest_road_victory_points(board, player_blue) == 0
+    assert get_longest_road_victory_points(board, player_red) == 0
