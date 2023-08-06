@@ -5,11 +5,12 @@ import networkx as nx
 import catan.board.types as T
 from catan.board.developments import trade_developement
 from catan.board.graph import BoardBuilder
-from catan.board.place import add_building
+from catan.board.place import add_building, add_connection
 from catan.board.victory_points import (
     count_city_points,
     count_connected_nodes,
     count_development_cards,
+    count_nodes_of_player,
     count_settelment_points,
     highest_knights,
 )
@@ -280,13 +281,13 @@ def test_connected_streets_one():
     G = nx.Graph()
     G.add_edge(1, 2)
 
-    assert count_connected_nodes(G) == 1
+    assert count_connected_nodes(G, []) == 1
 
 
 def test_connected_streets_zero():
     G = nx.Graph()
 
-    assert count_connected_nodes(G) == 0
+    assert count_connected_nodes(G, []) == 0
 
 
 def test_connected_streets_three():
@@ -296,7 +297,7 @@ def test_connected_streets_three():
     G.add_edge(2, 3)
     G.add_edge(3, 4)
 
-    assert count_connected_nodes(G) == 3
+    assert count_connected_nodes(G, []) == 3
 
 
 def test_connected_streets_foure_dist():
@@ -309,7 +310,7 @@ def test_connected_streets_foure_dist():
     G.add_edge(3, 4)
     G.add_edge(4, 5)
 
-    assert count_connected_nodes(G) == 5
+    assert count_connected_nodes(G, []) == 5
 
 
 def test_connected_streets_foure_short_cut():
@@ -323,7 +324,7 @@ def test_connected_streets_foure_short_cut():
     G.add_edge(4, 5)
     G.add_edge(1, 6)
 
-    assert count_connected_nodes(G) == 5
+    assert count_connected_nodes(G, []) == 5
 
 
 def test_connected_streets_foure_cicle():
@@ -336,7 +337,7 @@ def test_connected_streets_foure_cicle():
     G.add_edge(5, 6)
     G.add_edge(6, 1)
 
-    assert count_connected_nodes(G) == 6
+    assert count_connected_nodes(G, []) == 6
 
 
 def test_connected_streets_foure_advanced():
@@ -356,7 +357,7 @@ def test_connected_streets_foure_advanced():
     G.add_edge(10, 13)
     G.add_edge(13, 11)
 
-    assert count_connected_nodes(G) == 12
+    assert count_connected_nodes(G, []) == 12
 
 
 def test_connected_two_circulars():
@@ -371,7 +372,7 @@ def test_connected_two_circulars():
     G.add_edge(7, 3)
     G.add_edge(7, 1)
 
-    assert count_connected_nodes(G) == 8
+    assert count_connected_nodes(G, []) == 8
 
 
 def test_connected_two_circulars_arms():
@@ -390,4 +391,193 @@ def test_connected_two_circulars_arms():
     G.add_edge(10, 5)
     G.add_edge(10, 11)
 
-    assert count_connected_nodes(G) == 10
+    assert count_connected_nodes(G, []) == 10
+
+
+@patch(
+    "catan.board.place.get_ressources_of_player_dict",
+    return_value={
+        T.RESSOURCE.Brick: 100,
+        T.RESSOURCE.Lumber: 100,
+        T.RESSOURCE.Wool: 100,
+        T.RESSOURCE.Grain: 100,
+    },
+)
+@patch("catan.board.place.remove_ressource_from_player")
+def test_connected_roads_on_boards(player_blue, player_red):
+    board = (
+        BoardBuilder()
+        .create_board_of_size([3, 4, 5, 4, 3])
+        .with_player(player_blue)
+        .with_player(player_red)
+        .build()
+    )
+
+    add_building(board, player_blue, 100, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_blue, 100, 104, T.CONNECTION.ROAD)
+
+    count = count_nodes_of_player(board, player_blue)
+    assert count == 1
+
+
+@patch(
+    "catan.board.place.get_ressources_of_player_dict",
+    return_value={
+        T.RESSOURCE.Brick: 100,
+        T.RESSOURCE.Lumber: 100,
+        T.RESSOURCE.Wool: 100,
+        T.RESSOURCE.Grain: 100,
+    },
+)
+@patch("catan.board.place.remove_ressource_from_player")
+def test_connected_roads_on_boards_2(player_blue, player_red):
+    board = (
+        BoardBuilder()
+        .create_board_of_size([3, 4, 5, 4, 3])
+        .with_player(player_blue)
+        .with_player(player_red)
+        .build()
+    )
+
+    add_building(board, player_blue, 100, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_blue, 100, 104, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 103, 100, T.CONNECTION.ROAD)
+
+    count = count_nodes_of_player(board, player_blue)
+    assert count == 2
+
+
+@patch(
+    "catan.board.place.get_ressources_of_player_dict",
+    return_value={
+        T.RESSOURCE.Brick: 100,
+        T.RESSOURCE.Lumber: 100,
+        T.RESSOURCE.Wool: 100,
+        T.RESSOURCE.Grain: 100,
+    },
+)
+@patch("catan.board.place.remove_ressource_from_player")
+def test_connected_roads_on_boards_3(player_blue, player_red):
+    board = (
+        BoardBuilder()
+        .create_board_of_size([3, 4, 5, 4, 3])
+        .with_player(player_blue)
+        .with_player(player_red)
+        .build()
+    )
+
+    add_building(board, player_blue, 100, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_blue, 100, 104, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 104, 108, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 108, 112, T.CONNECTION.ROAD)
+    add_building(board, player_blue, 112, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_blue, 117, 112, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 117, 123, T.CONNECTION.ROAD)
+
+    count = count_nodes_of_player(board, player_blue)
+    assert count == 5
+
+
+@patch(
+    "catan.board.place.get_ressources_of_player_dict",
+    return_value={
+        T.RESSOURCE.Brick: 100,
+        T.RESSOURCE.Lumber: 100,
+        T.RESSOURCE.Wool: 100,
+        T.RESSOURCE.Grain: 100,
+    },
+)
+@patch("catan.board.place.remove_ressource_from_player")
+def test_connected_roads_on_boards_two_spots(player_blue, player_red):
+    board = (
+        BoardBuilder()
+        .create_board_of_size([3, 4, 5, 4, 3])
+        .with_player(player_blue)
+        .with_player(player_red)
+        .build()
+    )
+
+    add_building(board, player_blue, 100, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_blue, 100, 104, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 104, 108, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 108, 112, T.CONNECTION.ROAD)
+
+    add_building(board, player_blue, 135, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_blue, 135, 130, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 130, 124, T.CONNECTION.ROAD)
+
+    count = count_nodes_of_player(board, player_blue)
+    assert count == 3
+
+
+@patch(
+    "catan.board.place.get_ressources_of_player_dict",
+    return_value={
+        T.RESSOURCE.Brick: 100,
+        T.RESSOURCE.Lumber: 100,
+        T.RESSOURCE.Wool: 100,
+        T.RESSOURCE.Grain: 100,
+    },
+)
+@patch("catan.board.place.remove_ressource_from_player")
+def test_connected_roads_on_boards_interrupt_by_settelment(
+    _, __, player_blue, player_red
+):
+    board = (
+        BoardBuilder()
+        .create_board_of_size([3, 4, 5, 4, 3])
+        .with_player(player_blue)
+        .with_player(player_red)
+        .build()
+    )
+
+    add_building(board, player_blue, 100, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_blue, 100, 104, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 104, 108, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 108, 112, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 112, 117, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 117, 122, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 122, 128, T.CONNECTION.ROAD)
+
+    add_building(board, player_red, 122, T.BUILDING.SETTELMENT, founding=True)
+
+    count = count_nodes_of_player(board, player_blue)
+    assert count == 5
+
+
+@patch(
+    "catan.board.place.get_ressources_of_player_dict",
+    return_value={
+        T.RESSOURCE.Brick: 100,
+        T.RESSOURCE.Lumber: 100,
+        T.RESSOURCE.Wool: 100,
+        T.RESSOURCE.Grain: 100,
+    },
+)
+@patch("catan.board.place.remove_ressource_from_player")
+def test_connected_roads_on_boards_interrupt_by_street(_, __, player_blue, player_red):
+    board = (
+        BoardBuilder()
+        .create_board_of_size([3, 4, 5, 4, 3])
+        .with_player(player_blue)
+        .with_player(player_red)
+        .build()
+    )
+
+    add_building(board, player_blue, 100, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_blue, 100, 104, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 104, 108, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 108, 112, T.CONNECTION.ROAD)
+
+    add_building(board, player_blue, 129, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_blue, 129, 123, T.CONNECTION.ROAD)
+    add_connection(board, player_blue, 123, 117, T.CONNECTION.ROAD)
+
+    add_building(board, player_red, 116, T.BUILDING.SETTELMENT, founding=True)
+    add_connection(board, player_red, 116, 122, T.CONNECTION.ROAD)
+    add_connection(board, player_red, 122, 117, T.CONNECTION.ROAD)
+    add_connection(board, player_red, 117, 112, T.CONNECTION.ROAD)
+    add_connection(board, player_red, 116, 111, T.CONNECTION.ROAD)
+
+    assert count_nodes_of_player(board, player_blue) == 3
+    assert count_nodes_of_player(board, player_red) == 4

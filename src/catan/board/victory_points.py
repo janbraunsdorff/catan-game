@@ -12,7 +12,7 @@ import networkx as nx
 
 import catan.board.types as T
 from catan.board.developments import get_knights_of_player
-from catan.board.place import get_buildings_of_player
+from catan.board.place import get_buildings_of_player, get_ownership_of_node
 
 
 def count_settelment_points(G: T.Board, player: Player) -> int:
@@ -93,6 +93,7 @@ def get_conected_nodes_recursive(
     start_node: int,
     depth: int,
     history: Set[Tuple[int, int]],
+    stop_nodes: List[int],
 ) -> Node:
     surrounding_nodes = get_conected_nodes_to(edges, start_node)
     surrounding_nodes -= history
@@ -101,17 +102,20 @@ def get_conected_nodes_recursive(
     if len(surrounding_nodes) > 0:
         for x in surrounding_nodes:
             further_node = x[0] if x[0] != start_node else x[1]
+            if further_node in stop_nodes:
+                continue
+
             hc = history.copy()
             hc.add(x)
             leafe = get_conected_nodes_recursive(
-                edges, further_node, depth=depth + 1, history=hc
+                edges, further_node, depth=depth + 1, history=hc, stop_nodes=stop_nodes
             )
             leafes.append(leafe)
 
     return Node(start_node, length=depth, leafes=leafes)
 
 
-def count_connected_nodes(G: T.Board) -> int:
+def count_connected_nodes(G: T.Board, stopnodes: List[int]) -> int:
     edges = G.edges()
     edges = sorted(edges, key=lambda element: (element[0], element[1]))
     nodes = [x for x, y in edges]
@@ -121,9 +125,64 @@ def count_connected_nodes(G: T.Board) -> int:
 
     longest_depth = 0
     for start_node in nodes:
-        root = get_conected_nodes_recursive(edges, start_node, 0, set())
+        root = get_conected_nodes_recursive(edges, start_node, 0, set(), stopnodes)
         depth = root.get_longest_path()
         if depth > longest_depth:
             longest_depth = depth
 
     return longest_depth
+
+
+def get_filter_nodes_by_player(G: T.Board):
+    def filter_nodes(node):
+        node_data = G.nodes[node]
+
+        if node_data["type"] != T.NODE_TYPE.BUILDING:
+            return False
+
+        if node_data["building_type"] == T.BUILDING.MISSING:
+            return True
+
+        return True
+
+    return filter_nodes
+
+
+def get_filter_edges_by_player(G: T.Board, plyer: Player):
+    def filter_edges(node_v, node_u):
+        edge = G.get_edge_data(node_v, node_u)
+
+        if edge["type"] != T.EDGE_TYPE.STREET:
+            return False
+
+        if edge["street_type"] == T.CONNECTION.MISSING:
+            return False
+
+        if edge["owner"] != plyer.color:
+            return False
+
+        return True
+
+    return filter_edges
+
+
+def count_nodes_of_player(G: T.Board, player: Player) -> int:
+    sub_graph = nx.subgraph_view(
+        G,
+        filter_edge=get_filter_edges_by_player(G, player),
+        filter_node=get_filter_nodes_by_player(G),
+    )
+
+    stop_nodes_owner: List[Tuple[int, str]] = [
+        (node, get_ownership_of_node(G, node))
+        for node, data in G.nodes(data=True)
+        if data["type"] == T.NODE_TYPE.BUILDING
+    ]
+
+    stop_nodes: List[int] = list(
+        map(
+            lambda x: x[0],
+            filter(lambda x: x[1] != "" and x[1] != player.color, stop_nodes_owner),
+        )
+    )
+    return count_connected_nodes(sub_graph, stopnodes=stop_nodes)

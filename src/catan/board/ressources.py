@@ -144,14 +144,14 @@ def player_has_port(G: T.Board, player: Player, port: T.PORT):
         ]:
             if (
                 G.nodes[node_a]["type"] == T.NODE_TYPE.BUILDING
-                and G.nodes[node_a]["bulding_type"] != T.BUILDING.MISSING
+                and G.nodes[node_a]["building_type"] != T.BUILDING.MISSING
                 and G.has_edge(node_a, player.color)
             ):
                 return True
 
             if (
                 G.nodes[node_b]["type"] == T.NODE_TYPE.BUILDING
-                and G.nodes[node_b]["bulding_type"] != T.BUILDING.MISSING
+                and G.nodes[node_b]["building_type"] != T.BUILDING.MISSING
                 and G.has_edge(node_b, player.color)
             ):
                 return True
@@ -276,7 +276,7 @@ def add_ressource_after_dice_roll(G: T.Board, dice_value: int):
 
         players = []
         for r in get_ressources:
-            if G.nodes[r]["bulding_type"] == T.BUILDING.SETTELMENT:
+            if G.nodes[r]["building_type"] == T.BUILDING.SETTELMENT:
                 ownership = [
                     n
                     for r, n, y in G.edges(r, data=True)
@@ -284,7 +284,7 @@ def add_ressource_after_dice_roll(G: T.Board, dice_value: int):
                 ][0]
                 players.append(ownership)
 
-            if G.nodes[r]["bulding_type"] == T.BUILDING.CITY:
+            if G.nodes[r]["building_type"] == T.BUILDING.CITY:
                 ownership = [
                     n
                     for r, n, y in G.edges(r, data=True)

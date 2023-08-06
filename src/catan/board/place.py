@@ -33,7 +33,7 @@ def add_building(
         raise_on_error=True,
     )
 
-    G.nodes[index]["bulding_type"] = building
+    G.nodes[index]["building_type"] = building
 
     if building == T.BUILDING.CITY:
         G.add_edge(player.color, index, type=T.EDGE_TYPE.CITY_ONWERSHIP)
@@ -94,7 +94,7 @@ def add_connection(
     if edge["type"] != T.EDGE_TYPE.STREET:
         raise PlaceNotAllowed("Connection is not a street")
 
-    if edge["street_type"] != T.CONNECTION.Missing:
+    if edge["street_type"] != T.CONNECTION.MISSING:
         raise PlaceNotAllowed("A street alreay exists")
 
     ressources = get_ressources_of_player_dict(G, player)
@@ -108,7 +108,7 @@ def add_connection(
 
         connecetd_to_building = (
             get_ownership_of_node(G, node) == player.color
-            and n["bulding_type"] != T.BUILDING.MISSING
+            and n["building_type"] != T.BUILDING.MISSING
         )
         connected_to_street = (
             len(_get_souring_streets_of_street(G=G, player=player, node=node)) > 0
@@ -176,7 +176,7 @@ def _pass_or_raise_building_not_connected_to_street(
         s
         for f, t, s in edges
         if s["type"] == T.EDGE_TYPE.STREET
-        and s["street_type"] == T.CONNECTION.Road
+        and s["street_type"] == T.CONNECTION.ROAD
         and s["owner"] == player.color
     ]
 
@@ -195,7 +195,7 @@ def _pass_or_raise_buldings_are_to_close(G: T.Board, index: int):
     neighbours = list(set(neighbour_a))
 
     for n in neighbours:
-        if G.nodes[n]["bulding_type"] != T.BUILDING.MISSING:
+        if G.nodes[n]["building_type"] != T.BUILDING.MISSING:
             raise PlaceNotAllowed("Building too close to another")
 
 
@@ -255,17 +255,17 @@ def _pass_or_raise_has_enough_ressources_for_city(G: T.Board, player: Player):
 def _pass_or_raise_can_place_settelment(G: T.Board, index: int):
     node = G.nodes[index]
 
-    if node["bulding_type"] != T.BUILDING.MISSING:
+    if node["building_type"] != T.BUILDING.MISSING:
         raise PlaceNotAllowed(
-            f"Can not place building to an already build node. Current buiding type {node['bulding_type']}"
+            f"Can not place building to an already build node. Current buiding type {node['building_type']}"
         )
 
 
 def _pass_or_raise_can_place_city(G: T.Board, player: Player, index: int):
     node = G.nodes[index]
-    if node["bulding_type"] != T.BUILDING.SETTELMENT:
+    if node["building_type"] != T.BUILDING.SETTELMENT:
         raise PlaceNotAllowed(
-            f"Can not upgrade settlement. Target Node is not any settelment, got: {node['bulding_type']}"
+            f"Can not upgrade settlement. Target Node is not any settelment, got: {node['building_type']}"
         )
 
     edges = G.edges(index, data=True)

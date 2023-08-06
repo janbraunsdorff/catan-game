@@ -25,6 +25,7 @@ from typing import Dict, List, Self, Tuple
 from uuid import uuid4
 
 import networkx as nx
+from matplotlib import pyplot as plt
 
 import catan.board.types as T
 
@@ -204,7 +205,7 @@ def create_empty_buildings(
                     cnt_buildings,
                     {
                         "type": T.NODE_TYPE.BUILDING,
-                        "bulding_type": T.BUILDING.MISSING,
+                        "building_type": T.BUILDING.MISSING,
                         "coor": x,
                     },
                 )
@@ -252,7 +253,7 @@ def create_empty_streets(
                 x,
                 y,
                 type=T.EDGE_TYPE.STREET,
-                street_type=T.CONNECTION.Missing,
+                street_type=T.CONNECTION.MISSING,
                 coor=[x, y],
                 owner=None,
             )
@@ -298,3 +299,57 @@ def add_development_cards(G: T.Board) -> T.Board:
         )
 
     return G
+
+
+def print(G: T.Board) -> None:  # pragma: no cover
+    buildings = [x for x, y in G.nodes(data=True) if y["type"] == T.NODE_TYPE.BUILDING]
+    nodes = [x for x, y in G.nodes(data=True) if y["type"] == T.NODE_TYPE.TILE]
+    ports = [x for x, y in G.nodes(data=True) if y["type"] == T.NODE_TYPE.PORT]
+
+    fixed_positions: Dict[int, Tuple[int, int]] = {}
+    fixed_positions |= {
+        x: y["coor"] for x, y in G.nodes(data=True) if y["type"] == T.NODE_TYPE.BUILDING
+    }
+    fixed_positions |= {
+        x: y["coor"] for x, y in G.nodes(data=True) if y["type"] == T.NODE_TYPE.TILE
+    }
+
+    fixed_nodes = fixed_positions.keys()
+    pos = nx.spring_layout(G, pos=fixed_positions, fixed=fixed_nodes)
+
+    options = {"edgecolors": "tab:gray", "node_size": 100, "alpha": 0.9}
+    nx.draw_networkx_nodes(G, pos, nodelist=buildings, node_color="tab:red", **options)
+    nx.draw_networkx_nodes(G, pos, nodelist=nodes, node_color="tab:green", **options)
+    nx.draw_networkx_nodes(G, pos, nodelist=ports, node_color="tab:purple", **options)
+
+    nx.draw_networkx_labels(G, pos, labels={x: x for x in G.nodes()})
+
+    nx.draw_networkx_edges(
+        G,
+        pos,
+        edgelist=[
+            (a, b)
+            for a, b, y in G.edges(data=True)
+            if y["type"] == T.EDGE_TYPE.PRODUCE_TO
+        ],
+        edge_color="tab:red",
+        alpha=0.2,
+    )
+    nx.draw_networkx_edges(
+        G,
+        pos,
+        edgelist=[
+            (a, b) for a, b, y in G.edges(data=True) if y["type"] == T.EDGE_TYPE.STREET
+        ],
+        edge_color="tab:green",
+    )
+    nx.draw_networkx_edges(
+        G,
+        pos,
+        edgelist=[
+            (a, b) for a, b, y in G.edges(data=True) if y["type"] == T.EDGE_TYPE.PORT_TO
+        ],
+        edge_color="tab:purple",
+    )
+
+    plt.show()

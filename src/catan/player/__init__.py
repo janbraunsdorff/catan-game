@@ -32,4 +32,4 @@ class Player(ABC):
         add_building(G, self, index, T.BUILDING.CITY)
 
     def place_street(self, G: T.Board, node_u: int, node_v: int):
-        add_connection(G, self, node_u, node_v, T.CONNECTION.Road)
+        add_connection(G, self, node_u, node_v, T.CONNECTION.ROAD)

@@ -109,7 +109,7 @@ def test_place_already_filled(player_blue):
 
     G.add_node(player_blue.color, type=T.NODE_TYPE.PLAYER)
 
-    G.add_node(100, type=T.NODE_TYPE.BUILDING, bulding_type=T.BUILDING.SETTELMENT)
+    G.add_node(100, type=T.NODE_TYPE.BUILDING, building_type=T.BUILDING.SETTELMENT)
 
     with pytest.raises(PlaceNotAllowed) as e:
         add_building(
@@ -162,7 +162,7 @@ def test_place_city_only_if_settelment_was_placed_no_settelment(player_blue):
 
     G.add_node(player_blue.color, type=T.NODE_TYPE.PLAYER)
 
-    G.add_node(100, type=T.NODE_TYPE.BUILDING, bulding_type=T.BUILDING.MISSING)
+    G.add_node(100, type=T.NODE_TYPE.BUILDING, building_type=T.BUILDING.MISSING)
 
     with pytest.raises(PlaceNotAllowed) as e:
         add_building(
@@ -181,7 +181,7 @@ def test_place_city_only_if_own_settelment_was_placed(player_blue, player_red):
     G.add_node(player_blue.color, type=T.NODE_TYPE.PLAYER)
     G.add_node(player_red.color, type=T.NODE_TYPE.PLAYER)
 
-    G.add_node(100, type=T.NODE_TYPE.BUILDING, bulding_type=T.BUILDING.SETTELMENT)
+    G.add_node(100, type=T.NODE_TYPE.BUILDING, building_type=T.BUILDING.SETTELMENT)
 
     G.add_edge(player_blue.color, 100, type=T.EDGE_TYPE.SETTELMENT_OWNERSHIP)
 
@@ -213,7 +213,7 @@ def test_place_settelment_to_low_ressources(player_red, ressources):
     G = nx.Graph()
 
     G.add_node(player_red.color, type=T.NODE_TYPE.PLAYER)
-    G.add_node(100, type=T.NODE_TYPE.BUILDING, bulding_type=T.BUILDING.MISSING)
+    G.add_node(100, type=T.NODE_TYPE.BUILDING, building_type=T.BUILDING.MISSING)
 
     for r in ressources:
         ressource_id = str(uuid4())
@@ -254,7 +254,7 @@ def test_place_citiy_to_low_ressources(ressources, player_red):
     G = nx.Graph()
 
     G.add_node(player_red.color, type=T.NODE_TYPE.PLAYER)
-    G.add_node(100, type=T.NODE_TYPE.BUILDING, bulding_type=T.BUILDING.SETTELMENT)
+    G.add_node(100, type=T.NODE_TYPE.BUILDING, building_type=T.BUILDING.SETTELMENT)
     G.add_edge(player_red.color, 100, type=T.EDGE_TYPE.SETTELMENT_OWNERSHIP)
 
     for r in ressources:
@@ -282,8 +282,8 @@ def test_add_settelement_next_to_another_one_tile(player_red):
         G.add_node(ressource_id, type=T.NODE_TYPE.RESSOURCE, ressource=r)
         G.add_edge(player_red.color, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP)
 
-    G.nodes[100]["bulding_type"] = T.BUILDING.SETTELMENT
-    assert G.nodes[100]["bulding_type"] == T.BUILDING.SETTELMENT
+    G.nodes[100]["building_type"] = T.BUILDING.SETTELMENT
+    assert G.nodes[100]["building_type"] == T.BUILDING.SETTELMENT
 
     with pytest.raises(PlaceNotAllowed) as e:
         add_building(G=G, player=player_red, index=101, building=T.BUILDING.SETTELMENT)
@@ -323,7 +323,7 @@ def test_add_settelment_connect_to_other_road(player_red):
         G.add_node(ressource_id, type=T.NODE_TYPE.RESSOURCE, ressource=r)
         G.add_edge(player_red.color, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP)
 
-    G.edges[100, 101]["street_type"] = T.CONNECTION.Road
+    G.edges[100, 101]["street_type"] = T.CONNECTION.ROAD
     G.edges[100, 101]["owner"] = "404"
 
     with pytest.raises(PlaceNotAllowed) as e:
@@ -345,7 +345,7 @@ def test_successfull_place_settelmemt(player_red):
         G.add_node(ressource_id, type=T.NODE_TYPE.RESSOURCE, ressource=r)
         G.add_edge(player_red.color, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP)
 
-    G.edges[100, 101]["street_type"] = T.CONNECTION.Road
+    G.edges[100, 101]["street_type"] = T.CONNECTION.ROAD
     G.edges[100, 101]["owner"] = player_red.color
 
     num_nodes = len(G.nodes())
@@ -356,7 +356,7 @@ def test_successfull_place_settelmemt(player_red):
     assert len(G.nodes()) == num_nodes - 4
     assert len(G.edges()) == num_edges + 1 - 4
 
-    assert G.nodes[101]["bulding_type"] == T.BUILDING.SETTELMENT
+    assert G.nodes[101]["building_type"] == T.BUILDING.SETTELMENT
     assert len(get_ressources_of_player_list(G, player_red)) == 0
     assert (
         len(get_buildings_of_player(G, player_red, T.EDGE_TYPE.SETTELMENT_OWNERSHIP))
@@ -377,7 +377,7 @@ def test_city_place_settelmemt(player_red):
         G.add_node(ressource_id, type=T.NODE_TYPE.RESSOURCE, ressource=r)
         G.add_edge(player_red.color, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP)
 
-    G.edges[100, 101]["street_type"] = T.CONNECTION.Road
+    G.edges[100, 101]["street_type"] = T.CONNECTION.ROAD
     G.edges[100, 101]["owner"] = player_red.color
 
     add_building(G=G, player=player_red, index=101, building=T.BUILDING.SETTELMENT)
@@ -401,7 +401,7 @@ def test_city_place_settelmemt(player_red):
     assert len(G.nodes()) == num_nodes - 5
     assert len(G.edges()) == num_edges - 5
 
-    assert G.nodes[101]["bulding_type"] == T.BUILDING.CITY
+    assert G.nodes[101]["building_type"] == T.BUILDING.CITY
     assert len(get_ressources_of_player_list(G, player_red)) == 0
     assert len(get_buildings_of_player(G, player_red, T.EDGE_TYPE.CITY_ONWERSHIP)) == 1
     assert len(G.edges(player_red.color, data=True)) == 1
@@ -414,7 +414,7 @@ def test_founding_without_ressources_and_streets(player_red):
         G=G, player=player_red, index=101, building=T.BUILDING.SETTELMENT, founding=True
     )
 
-    assert G.nodes[101]["bulding_type"] == T.BUILDING.SETTELMENT
+    assert G.nodes[101]["building_type"] == T.BUILDING.SETTELMENT
     assert (
         len(get_buildings_of_player(G, player_red, T.EDGE_TYPE.SETTELMENT_OWNERSHIP))
         == 1
@@ -449,7 +449,7 @@ def test_retun_True_on_error(player_red):
         G.add_node(ressource_id, type=T.NODE_TYPE.RESSOURCE, ressource=r)
         G.add_edge(player_red.color, ressource_id, type=T.EDGE_TYPE.RESSOURCE_OWNERSHIP)
 
-    G.edges[100, 101]["street_type"] = T.CONNECTION.Road
+    G.edges[100, 101]["street_type"] = T.CONNECTION.ROAD
     G.edges[100, 101]["owner"] = player_red.color
 
     res = check_building(

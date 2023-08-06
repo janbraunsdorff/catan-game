@@ -42,9 +42,9 @@ class ROBBER(Enum):
 
 
 class CONNECTION(Enum):
-    Missing = 1
-    Road = 2
-    Boat = 3
+    MISSING = 1
+    ROAD = 2
+    BOAT = 3
 
 
 class BUILDING(Enum):

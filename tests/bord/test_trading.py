@@ -196,7 +196,7 @@ def test_trate_ressources_3_1_no_ressources_claimed(player_red, input_, output):
         .build()
     )
 
-    G.nodes[100]["bulding_type"] = T.BUILDING.SETTELMENT
+    G.nodes[100]["building_type"] = T.BUILDING.SETTELMENT
     G.add_edge(player_red.color, 100, type=T.EDGE_TYPE.SETTELMENT_OWNERSHIP)
 
     for r in range(2):
@@ -237,7 +237,7 @@ def test_trate_ressources_3_1_no_ressources_raise(player_red, input_, output):
         .build()
     )
 
-    G.nodes[100]["bulding_type"] = T.BUILDING.SETTELMENT
+    G.nodes[100]["building_type"] = T.BUILDING.SETTELMENT
     G.add_edge(player_red.color, 100, type=T.EDGE_TYPE.SETTELMENT_OWNERSHIP)
 
     for r in range(2):
@@ -273,7 +273,7 @@ def test_trate_ressources_3_1_other_player_claimed(player_red, player_blue):
         .build()
     )
 
-    G.nodes[100]["bulding_type"] = T.BUILDING.SETTELMENT
+    G.nodes[100]["building_type"] = T.BUILDING.SETTELMENT
     G.add_edge(player_blue.color, 100, type=T.EDGE_TYPE.SETTELMENT_OWNERSHIP)
 
     for r in range(4):
@@ -316,7 +316,7 @@ def test_trate_ressources_3_1_sucessfull(player_red, input_, output):
         .build()
     )
 
-    G.nodes[100]["bulding_type"] = T.BUILDING.CITY
+    G.nodes[100]["building_type"] = T.BUILDING.CITY
     G.add_edge(player_red.color, 100, type=T.EDGE_TYPE.CITY_ONWERSHIP)
 
     for r in range(4):
@@ -429,7 +429,7 @@ def test_trate_ressources_2_1_no_ressources_claimed(player_red, input_, output):
         .build()
     )
 
-    G.nodes[100]["bulding_type"] = T.BUILDING.SETTELMENT
+    G.nodes[100]["building_type"] = T.BUILDING.SETTELMENT
     G.add_edge(player_red.color, 100, type=T.EDGE_TYPE.SETTELMENT_OWNERSHIP)
 
     for r in range(1):
@@ -470,7 +470,7 @@ def test_trate_ressources_2_1_no_ressources_raise(player_red, input_, output, po
         .build()
     )
 
-    G.nodes[100]["bulding_type"] = T.BUILDING.SETTELMENT
+    G.nodes[100]["building_type"] = T.BUILDING.SETTELMENT
     G.add_edge(player_red.color, 100, type=T.EDGE_TYPE.SETTELMENT_OWNERSHIP)
 
     for r in range(1):
@@ -506,7 +506,7 @@ def test_trate_ressources_2_1_other_player_claimed(player_red, player_blue):
         .build()
     )
 
-    G.nodes[100]["bulding_type"] = T.BUILDING.SETTELMENT
+    G.nodes[100]["building_type"] = T.BUILDING.SETTELMENT
     G.add_edge(player_blue.color, 100, type=T.EDGE_TYPE.SETTELMENT_OWNERSHIP)
 
     for r in range(4):
@@ -551,7 +551,7 @@ def test_trate_ressources_2_1_sucessfull_different_ports(
         .build()
     )
 
-    G.nodes[100]["bulding_type"] = T.BUILDING.CITY
+    G.nodes[100]["building_type"] = T.BUILDING.CITY
     G.add_edge(player_red.color, 100, type=T.EDGE_TYPE.CITY_ONWERSHIP)
 
     for r in range(4):
